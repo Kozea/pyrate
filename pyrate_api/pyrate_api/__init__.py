@@ -1,9 +1,13 @@
 from flask import Flask
+from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 
 # instantiate the db
 db = SQLAlchemy()
+bcrypt = Bcrypt()
+migrate = Migrate()
 
 
 def create_app():
@@ -17,6 +21,8 @@ def create_app():
 
     # set up extensions
     db.init_app(app)
+    bcrypt.init_app(app)
+    migrate.init_app(app, db)
 
     # register blueprints
     from pyrate_api.users.views import users_blueprint
