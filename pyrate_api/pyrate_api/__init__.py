@@ -25,7 +25,9 @@ def create_app():
     migrate.init_app(app, db)
 
     # register blueprints
-    from pyrate_api.users.views import users_blueprint
+    from pyrate_api.users.users import users_blueprint
     app.register_blueprint(users_blueprint)
+    from pyrate_api.users.auth import auth_blueprint
+    app.register_blueprint(auth_blueprint)
 
     return app
