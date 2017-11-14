@@ -1,0 +1,8 @@
+# Atom
+.ropeproject/
+
+# Python
+__pycache__/
+
+# Pyrate
+pyrate_api/pyrate_api/db/
