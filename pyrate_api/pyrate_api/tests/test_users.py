@@ -76,3 +76,15 @@ class TestUserService(BaseTestCase):
             self.assertIn('toto', data['data']['users'][1]['username'])
             self.assertIn('test@test.com', data['data']['users'][0]['email'])
             self.assertIn('toto@toto.com', data['data']['users'][1]['email'])
+
+    def test_encode_auth_token(self):
+        """=> Ensure correct auth token generation"""
+        user = add_user('test', 'test@test.com', 'test')
+        auth_token = user.encode_auth_token(user.id)
+        self.assertTrue(isinstance(auth_token, bytes))
+
+    def test_decode_auth_token(self):
+        user = add_user('test', 'test@test.com', 'test')
+        auth_token = user.encode_auth_token(user.id)
+        self.assertTrue(isinstance(auth_token, bytes))
+        self.assertTrue(User.decode_auth_token(auth_token), user.id)
