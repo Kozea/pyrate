@@ -1,7 +1,9 @@
 from flask_script import Manager
-from pyrate_api import app, db
+from pyrate_api import create_app, db
+from pyrate_api.users.models import User
 
 
+app = create_app()
 manager = Manager(app)
 
 

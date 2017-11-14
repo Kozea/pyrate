@@ -1,27 +1,25 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 
-app = Flask(__name__)
-with app.app_context():
-    app.config.from_object('pyrate_api.config.DevelopmentConfig')
+# instantiate the db
+db = SQLAlchemy()
 
 
-db = SQLAlchemy(app)
+def create_app():
 
+    # instantiate the app
+    app = Flask(__name__)
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    # set config
+    with app.app_context():
+        app.config.from_object('pyrate_api.config.DevelopmentConfig')
 
-    def __repr__(self):
-        return '<User %r>' % self.username
+    # set up extensions
+    db.init_app(app)
 
+    # register blueprints
+    from pyrate_api.users.views import users_blueprint
+    app.register_blueprint(users_blueprint)
 
-@app.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify({
-        'status': 'success',
-        'message': 'pong!'
-    })
+    return app
