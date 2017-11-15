@@ -2,7 +2,7 @@ import json
 
 from pyrate_api.tests.base import BaseTestCase
 from pyrate_api.corpus.models import Corpus_category, Corpus_text
-from pyrate_api.tests.utils import add_category
+from pyrate_api.tests.utils import add_category, add_user
 
 
 
@@ -61,3 +61,38 @@ class TestCorpusService(BaseTestCase):
             self.assertIn('error', data['status'])
 
             self.assertIn('Category 999999999 does not exist.', data['message'])
+
+    def test_add_text_in_corpus(self):
+        """=> Add a text in corpus"""
+        add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans')
+
+        with self.client:
+
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(
+                    email='test@test.com',
+                    password='test'
+                )),
+                content_type='application/json'
+            )
+
+            response = self.client.post('/corpus',
+                data=json.dumps(dict(
+                    title='les miserables',
+                    filename='les_miserables.txt',
+                    category_id=1
+                )),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' + json.loads(
+                        resp_login.data.decode()
+                    )['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'success')
+            self.assertTrue(
+                data['message'] == f'Text "les miserables" was added!')
+            self.assertEqual(response.status_code, 201)
