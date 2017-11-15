@@ -2,7 +2,28 @@
 .ropeproject/
 
 # Python
+*.pyc
+*.pyo
 __pycache__/
+*.egg-info
+.eggs
+.env*
+
+# Node
+node_modules/
 
 # Pyrate
-pyrate_api/pyrate_api/db/
+lib/backend/application-custom.cfg
+lib/backend/pyrate_api/pyrate_api/db/
+lib/frontend/assets/
+lib/frontend/static/
+
+# Caches
+.cache
+.coverage
+.eslintcache
+
+# Build
+dist
+build
+Makefile.custom.config

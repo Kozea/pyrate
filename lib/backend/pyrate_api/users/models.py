@@ -18,7 +18,8 @@ class User(db.Model):
 
     def __init__(
             self, username, email, password,
-            created_at=datetime.datetime.utcnow()):
+            created_at=datetime.datetime.utcnow()
+    ):
         self.username = username
         self.email = email
         self.password = bcrypt.generate_password_hash(
@@ -30,12 +31,16 @@ class User(db.Model):
         """Generates the auth token"""
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(
-                    days=current_app.config.get('TOKEN_EXPIRATION_DAYS'),
-                    seconds=current_app.config.get('TOKEN_EXPIRATION_SECONDS')
-                ),
-                'iat': datetime.datetime.utcnow(),
-                'sub': user_id
+                'exp':
+                    datetime.datetime.utcnow() + datetime.timedelta(
+                        days=current_app.config.get('TOKEN_EXPIRATION_DAYS'),
+                        seconds=current_app.config.
+                        get('TOKEN_EXPIRATION_SECONDS')
+                    ),
+                'iat':
+                    datetime.datetime.utcnow(),
+                'sub':
+                    user_id
             }
             return jwt.encode(
                 payload,
@@ -49,7 +54,9 @@ class User(db.Model):
     def decode_auth_token(auth_token):
         """Decodes the auth token - :param auth_token: - :return: integer|string"""
         try:
-            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+            payload = jwt.decode(
+                auth_token, current_app.config.get('SECRET_KEY')
+            )
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again.'

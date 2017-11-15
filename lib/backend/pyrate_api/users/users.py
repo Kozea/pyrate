@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify
 from .models import User
 
-
 users_blueprint = Blueprint('users', __name__)
 
 
@@ -18,22 +17,14 @@ def get_users():
             'created_at': user.created_at
         }
         users_list.append(user_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'users': users_list
-        }
-    }
+    response_object = {'status': 'success', 'data': {'users': users_list}}
     return jsonify(response_object), 200
 
 
 @users_blueprint.route('/users/<user_id>', methods=['GET'])
 def get_single_user(user_id):
     """Get single user details"""
-    response_object = {
-        'status': 'fail',
-        'message': 'User does not exist'
-    }
+    response_object = {'status': 'fail', 'message': 'User does not exist'}
     try:
         user = User.query.filter_by(id=int(user_id)).first()
         if not user:
@@ -54,7 +45,4 @@ def get_single_user(user_id):
 
 @users_blueprint.route('/ping', methods=['GET'])
 def ping_pong():
-    return jsonify({
-        'status': 'success',
-        'message': 'pong!'
-    })
+    return jsonify({'status': 'success', 'message': 'pong!'})

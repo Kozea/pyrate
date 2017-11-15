@@ -4,7 +4,6 @@ from sqlalchemy import exc, or_
 from .models import User
 from pyrate_api import db, bcrypt
 
-
 auth_blueprint = Blueprint('auth', __name__)
 
 
@@ -13,10 +12,7 @@ def register_user():
     # get post data
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'error',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'error', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     username = post_data.get('username')
     email = post_data.get('email')
@@ -24,14 +20,11 @@ def register_user():
     try:
         # check for existing user
         user = User.query.filter(
-            or_(User.username == username, User.email == email)).first()
+            or_(User.username == username, User.email == email)
+        ).first()
         if not user:
             # add new user to db
-            new_user = User(
-                username=username,
-                email=email,
-                password=password
-            )
+            new_user = User(username=username, email=email, password=password)
             db.session.add(new_user)
             db.session.commit()
             # generate auth token
@@ -51,10 +44,7 @@ def register_user():
     # handler errors
     except (exc.IntegrityError, ValueError) as e:
         db.session.rollback()
-        response_object = {
-            'status': 'error',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'error', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
 
@@ -63,10 +53,7 @@ def login_user():
     # get post data
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'error',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'error', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     email = post_data.get('email')
     password = post_data.get('password')
@@ -91,10 +78,7 @@ def login_user():
     # handler errors
     except (exc.IntegrityError, ValueError) as e:
         db.session.rollback()
-        response_object = {
-            'status': 'error',
-            'message': 'Try again'
-        }
+        response_object = {'status': 'error', 'message': 'Try again'}
         return jsonify(response_object), 500
 
 
@@ -112,10 +96,7 @@ def logout_user():
             }
             return jsonify(response_object), 200
         else:
-            response_object = {
-                'status': 'error',
-                'message': resp
-            }
+            response_object = {'status': 'error', 'message': resp}
             return jsonify(response_object), 401
     else:
         response_object = {

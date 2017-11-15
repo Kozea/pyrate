@@ -8,16 +8,17 @@ from pyrate_api.tests.utils import add_user
 
 
 class TestAuthBlueprint(BaseTestCase):
-
     def test_user_registration(self):
         with self.client:
             response = self.client.post(
                 '/auth/register',
-                data=json.dumps(dict(
-                    username='justatest',
-                    email='test@test.com',
-                    password='123456'
-                )),
+                data=json.dumps(
+                    dict(
+                        username='justatest',
+                        email='test@test.com',
+                        password='123456'
+                    )
+                ),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
@@ -32,16 +33,20 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/auth/register',
-                data=json.dumps(dict(
-                    username='test',
-                    email='test@test.com',
-                    password='test'
-                )),
+                data=json.dumps(
+                    dict(
+                        username='test',
+                        email='test@test.com',
+                        password='test'
+                    )
+                ),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'error')
-            self.assertTrue(data['message'] == 'Sorry. That user already exists.')
+            self.assertTrue(
+                data['message'] == 'Sorry. That user already exists.'
+            )
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 400)
 
@@ -73,8 +78,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/auth/register',
-                data=json.dumps(dict(
-                    username='test', password='test')),
+                data=json.dumps(dict(username='test', password='test')),
                 content_type='application/json',
             )
             data = json.loads(response.data.decode())
@@ -86,8 +90,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/auth/register',
-                data=json.dumps(dict(
-                    username='test', email='test@test.com')),
+                data=json.dumps(dict(username='test', email='test@test.com')),
                 content_type='application/json',
             )
             data = json.loads(response.data.decode())
@@ -100,10 +103,7 @@ class TestAuthBlueprint(BaseTestCase):
             add_user('test', 'test@test.com', 'test')
             response = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(
-                    email='test@test.com',
-                    password='test'
-                )),
+                data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
@@ -117,10 +117,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(
-                    email='test@test.com',
-                    password='test'
-                )),
+                data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
@@ -135,19 +132,15 @@ class TestAuthBlueprint(BaseTestCase):
             # user login
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(
-                    email='test@test.com',
-                    password='test'
-                )),
+                data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             # valid token logout
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authorization='Bearer ' + json.loads(
-                        resp_login.data.decode()
-                    )['auth_token']
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -160,10 +153,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(
-                    email='test@test.com',
-                    password='test'
-                )),
+                data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             # invalid token logout
@@ -171,9 +161,8 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authorization='Bearer ' + json.loads(
-                        resp_login.data.decode()
-                    )['auth_token']
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -182,16 +171,18 @@ class TestAuthBlueprint(BaseTestCase):
             print('===========')
             self.assertTrue(data['status'] == 'error')
             self.assertTrue(
-                data['message'] == 'Signature expired. Please log in again.')
+                data['message'] == 'Signature expired. Please log in again.'
+            )
             self.assertEqual(response.status_code, 401)
 
     def test_invalid_logout(self):
         with self.client:
             response = self.client.get(
-                '/auth/logout',
-                headers=dict(Authorization='Bearer invalid'))
+                '/auth/logout', headers=dict(Authorization='Bearer invalid')
+            )
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'error')
             self.assertTrue(
-                data['message'] == 'Invalid token. Please log in again.')
+                data['message'] == 'Invalid token. Please log in again.'
+            )
             self.assertEqual(response.status_code, 401)
