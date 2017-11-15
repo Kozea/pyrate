@@ -1,11 +1,101 @@
-from flask import Blueprint, jsonify
-from .models import Corpus_text, Corpus_category
+from flask import Blueprint, jsonify, request
 
+from .models import Corpus_text, Corpus_category
+from pyrate_api import db
 
 corpus_blueprint = Blueprint('corpus', __name__)
 
 
-@corpus_blueprint.route('/corpus/', methods=['GET'])
+@corpus_blueprint.route('/categories', methods=['GET'])
+def get_corpus_categories():
+    """Get all corpus categories"""
+    categories = Corpus_category.query.all()
+    categories_list = []
+    for category in categories:
+        category_object = {
+            'id': category.id,
+            'label': category.label
+        }
+        categories_list.append(category_object)
+    response_object = {
+        'status': 'success',
+        'data': {
+            'text': categories_list
+        }
+    }
+    return jsonify(response_object), 200
+
+
+@corpus_blueprint.route('/categories', methods=['POST'])
+def add_category():
+    """Add a new corpus category"""
+    post_data = request.get_json()
+    if not post_data:
+        response_object = {
+            'status': 'fail',
+            'message': 'Invalid payload.'
+        }
+        return jsonify(response_object), 400
+    label = post_data.get('label')
+    try:
+        category = Corpus_category.query.filter_by(label=label).first()
+        if not category:
+            db.session.add(Corpus_category(label=label))
+            db.session.commit()
+            response_object = {
+                'status': 'success',
+                'message': f'"{label}" was added!'
+            }
+            return jsonify(response_object), 201
+        else:
+            response_object = {
+                'status': 'fail',
+                'message': 'Sorry. That category already exists.'
+            }
+            return jsonify(response_object), 400
+    except exc.IntegrityError as e:
+        db.session.rollback()
+        response_object = {
+            'status': 'fail',
+            'message': 'Invalid payload.'
+        }
+        return jsonify(response_object), 400
+
+
+@corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
+def get_corpus_category(cat_id):
+    """Get one corpus categories"""
+    category = Corpus_category.query.filter_by(id=cat_id).first()
+    response_object = {
+        'status': 'success',
+        'data': {
+            'label': category.label
+        }
+    }
+    return jsonify(response_object), 200
+
+
+@corpus_blueprint.route('/categories/<cat_id>', methods=['DELETE'])
+def delete_corpus_category(cat_id):
+    """Delete one corpus category"""
+    cat = Corpus_category.query.filter_by(id=cat_id).first()
+    if not cat:
+        response_object = {
+            'status': 'error',
+            'message': f'Category {cat_id} does not exist.'
+        }
+        return jsonify(response_object), 400
+
+    Corpus_category.query.filter_by(id=cat_id).delete()
+    response_object = {
+        'status': 'success',
+        'message': f'Category {cat_id} deleted.'
+    }
+    return jsonify(response_object), 200
+
+
+
+@corpus_blueprint.route('/corpus', methods=['GET'])
 def get_corpus():
     """Get all texts"""
     corpus = Corpus_text.query.all()
@@ -24,26 +114,6 @@ def get_corpus():
         'status': 'success',
         'data': {
             'text': corpus_list
-        }
-    }
-    return jsonify(response_object), 200
-
-
-@corpus_blueprint.route('/categories/', methods=['GET'])
-def get_corpus_categories():
-    """Get all corpus categories"""
-    categories = Corpus_category.query.all()
-    categories_list = []
-    for category in categories:
-        category_object = {
-            'id': category.id,
-            'label': category.label
-        }
-        categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'text': categories_list
         }
     }
     return jsonify(response_object), 200
