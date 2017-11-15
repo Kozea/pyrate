@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from .models import Corpus_text, Corpus_category
 from pyrate_api import db
+from pyrate_api.users.models import User
 
 corpus_blueprint = Blueprint('corpus', __name__)
 
@@ -148,19 +149,21 @@ def add_corpus():
     try:
         text = Corpus_text.query.filter_by(title=title).first()
         if not text:
-            db.session.add(Corpus_category(title=title,
-                                           filename=filename,
-                                           category_id=category_id))
+            db.session.add(Corpus_text(title=title,
+                                       filename=filename,
+                                       category_id=category_id,
+                                       author_id=user_id))
+
             db.session.commit()
             response_object = {
                 'status': 'success',
-                'message': f'"{label}" was added!'
+                'message': f'Text "{title}" was added!'
             }
             return jsonify(response_object), 201
         else:
             response_object = {
                 'status': 'fail',
-                'message': 'Sorry. That category already exists.'
+                'message': 'Sorry. A text with same title already exists.'
             }
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
