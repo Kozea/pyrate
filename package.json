@@ -20,7 +20,6 @@
     "fix": "prettier --write '{,lib/tests/**/,lib/frontend/src/**/}*.js?(x)'",
     "lint-all": "make fix lint"
   },
-  "pre-commit": "lint-all",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
