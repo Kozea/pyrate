@@ -1,8 +1,9 @@
-from flask_script import Manager
-from flask_migrate import MigrateCommand
 import unittest
 
+from flask_migrate import MigrateCommand
+from flask_script import Manager
 from pyrate_api import create_app, db
+from pyrate_api.corpus.models import Corpus_category, Corpus_text
 from pyrate_api.users.models import User
 
 app = create_app()
