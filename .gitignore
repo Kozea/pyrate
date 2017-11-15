@@ -14,7 +14,7 @@ node_modules/
 
 # Pyrate
 lib/backend/application-custom.cfg
-lib/backend/pyrate_api/pyrate_api/db/
+lib/backend/pyrate_api/db/
 lib/frontend/assets/
 lib/frontend/static/
 
