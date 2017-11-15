@@ -3,12 +3,14 @@ import { hydrate, render } from 'react-dom'
 import RedBox from 'redbox-react'
 
 import App from './components/App'
+import { debug } from './config'
 
 export const rootNode = document.getElementById('root')
 
 export const renderRoot = handleError => {
   try {
-    hydrate(<App />, rootNode)
+    const renderMode = debug ? render : hydrate
+    renderMode(<App />, rootNode)
   } catch (error) {
     handleError(error)
   }

@@ -19,6 +19,7 @@ import {
   debug,
   dirs,
   forcePolyfill,
+  inspect,
   publicPath,
   server,
   serverUrl,
@@ -208,7 +209,7 @@ if (debug && server) {
         this.server = childProcess.fork(path.resolve(dirs.dist, 'server.js'), {
           cwd,
           silent: false,
-          execArgv: ['--inspect'],
+          execArgv: inspect ? ['--inspect'] : [],
         })
       })
     }
