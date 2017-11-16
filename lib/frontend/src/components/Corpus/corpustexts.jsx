@@ -15,18 +15,18 @@ class Corpus extends React.Component {
         <ul>
           <li>
             <span className="corpustitle">Les Misérables, de Victor HUGO</span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Modifier</button> <button>Supprimer</button>
           </li>
           <li>
             <span className="corpustitle">etcc</span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Modifier</button> <button>Supprimer</button>
           </li>
           <li>
             <span className="corpustitle">etcccc</span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Modifier</button> <button>Supprimer</button>
           </li>
         </ul>
-        <button>Add a corpus</button>
+        <button>Ajouter un document</button>
       </div>
     )
   }

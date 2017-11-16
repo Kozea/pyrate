@@ -11,18 +11,18 @@ class Content extends React.Component {
   render() {
     return (
       <div className="content">
-        <label>Category : </label>
+        <label>Catégorie : </label>
         <select>
-          <option>Stage</option>
-          <option>Reports</option>
+          <option>Rapports de stage</option>
+          <option>Lettres de motivation</option>
         </select>
         <br />
-        <button>Generate</button>
+        <button>Générer</button>
         <br />
-        <label>Result : </label>
+        <label>Résultat : </label>
         <br />
         <output />
-        <button>Save</button>
+        <button>Sauvegarder</button>
       </div>
     )
   }

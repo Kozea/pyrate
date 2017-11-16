@@ -32,9 +32,11 @@ class NavBar extends React.Component {
     return (
       <div className="navbar">
         <h1>PyRaTe</h1>
-        <button onClick={() => (window.location.href = '/login')}>Login</button>
+        <button onClick={() => (window.location.href = '/login')}>
+          Se connecter
+        </button>
         <button onClick={() => (window.location.href = '/register')}>
-          Register
+          S&apos;inscrire
         </button>
         {this.renderRoute()}
       </div>

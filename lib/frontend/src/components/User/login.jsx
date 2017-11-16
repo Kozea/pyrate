@@ -4,17 +4,18 @@ export default function Login() {
   return (
     <div>
       <label>
-        Email: <input id="email" type="text" />{' '}
+        Email: <input id="email" type="text" placeholder="email" />{' '}
       </label>
       <br />
       <label>
-        Password: <input id="input1" type="password" />
+        Mot de passe:{' '}
+        <input id="input1" type="password" placeholder="password" />
       </label>
       <div>
         <button type="button" onClick={() => (window.location.href = '/')}>
-          Cancel
+          Annuler
         </button>
-        <button type="submit">Sign Up</button>
+        <button type="submit">Valider</button>
       </div>
     </div>
   )

@@ -3,42 +3,38 @@ import React from 'react'
 export default function Register() {
   return (
     <div>
-      <label>Username : </label>
-      <input
-        type="text"
-        placeholder="Enter Username"
-        name="username"
-        required
-      />
+      <label>Nom d&apos;utilisateur : </label>
+      <input type="text" placeholder="username" name="username" required />
       <br />
 
       <label>Email : </label>
-      <input type="text" placeholder="Enter Email" name="email" required />
+      <input type="text" placeholder="email" name="email" required />
       <br />
 
-      <label>Password : </label>
-      <input type="password" placeholder="Enter Password" name="psw" required />
+      <label>Mot de passe : </label>
+      <input type="password" placeholder="password" name="psw" required />
       <br />
 
-      <label>Repeat Password : </label>
+      <label>Confirmation du mot de passe : </label>
       <input
         type="password"
-        placeholder="Repeat Password"
+        placeholder="password"
         name="psw-repeat"
         required
       />
       <br />
 
       <p>
-        By creating an account you agree to our <a href="#">Terms & Privacy</a>.
+        La création d&apos;un compte implique que vous avez lu et accepté les{' '}
+        <a href="#">termes et conditions d&apos;utilisation</a>.
       </p>
       <br />
 
       <div>
         <button type="button" onClick={() => (window.location.href = '/')}>
-          Cancel
+          Annuler
         </button>
-        <button type="submit">Sign Up</button>
+        <button type="submit">Valider</button>
       </div>
     </div>
   )

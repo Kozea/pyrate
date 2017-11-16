@@ -11,28 +11,28 @@ class Texts extends React.Component {
   render() {
     return (
       <div>
-        <label>Texts : </label>
+        <label>Textes : </label>
         <ul>
           <li>
             <span className="textstitle">
               [Catégorie]Texte généré le 10/10/10 par MonsieurX
             </span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Editer</button> <button>Supprimer</button>
           </li>
           <li>
             <span className="textstitle">
               [Catégorie]Texte généré le 10/01/17 par MonsieurY
             </span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Editer</button> <button>Supprimer</button>
           </li>
           <li>
             <span className="textstitle">
               [Catégorie]Texte généré le 10/08/09 par MonsieurZ
             </span>
-            <button>Edit</button> <button>Delete</button>
+            <button>Editer</button> <button>Supprimer</button>
           </li>
         </ul>
-        <button>Generate a new text</button>
+        <button>Générer un nouveau texte</button>
       </div>
     )
   }

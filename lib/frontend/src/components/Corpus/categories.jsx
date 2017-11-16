@@ -11,19 +11,19 @@ class Categories extends React.Component {
   render() {
     return (
       <div>
-        <label>Categories : </label>
+        <label>Catégories : </label>
         <ul>
           <li>
-            Novels <button>Edit</button> <button>Delete</button>
+            Romans <button>Modifier</button> <button>Supprimer</button>
           </li>
           <li>
-            Newspapers <button>Edit</button> <button>Delete</button>
+            Articles <button>Modifier</button> <button>Supprimer</button>
           </li>
           <li>
-            Reports <button>Edit</button> <button>Delete</button>
+            Rapports <button>Modifier</button> <button>Supprimer</button>
           </li>
         </ul>
-        <button>Add a category</button>
+        <button>Ajouter une catégorie</button>
       </div>
     )
   }
