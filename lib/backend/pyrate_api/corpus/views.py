@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 
-from .models import Corpus_text, Corpus_category
-from pyrate_api import db
-from pyrate_api.users.models import User
+from .. import db
+from ..users.models import User
+from .models import Corpus_category, Corpus_text
 
 corpus_blueprint = Blueprint('corpus', __name__)
 
@@ -13,17 +13,9 @@ def get_corpus_categories():
     categories = Corpus_category.query.all()
     categories_list = []
     for category in categories:
-        category_object = {
-            'id': category.id,
-            'label': category.label
-        }
+        category_object = {'id': category.id, 'label': category.label}
         categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'text': categories_list
-        }
-    }
+    response_object = {'status': 'success', 'data': {'text': categories_list}}
     return jsonify(response_object), 200
 
 
@@ -32,10 +24,7 @@ def add_category():
     """Add a new corpus category"""
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     label = post_data.get('label')
     try:
@@ -56,10 +45,7 @@ def add_category():
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
         db.session.rollback()
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
 
@@ -67,12 +53,7 @@ def add_category():
 def get_corpus_category(cat_id):
     """Get one corpus categories"""
     category = Corpus_category.query.filter_by(id=cat_id).first()
-    response_object = {
-        'status': 'success',
-        'data': {
-            'label': category.label
-        }
-    }
+    response_object = {'status': 'success', 'data': {'label': category.label}}
     return jsonify(response_object), 200
 
 
@@ -95,7 +76,6 @@ def delete_corpus_category(cat_id):
     return jsonify(response_object), 200
 
 
-
 @corpus_blueprint.route('/corpus', methods=['GET'])
 def get_corpus():
     """Get all texts"""
@@ -111,12 +91,7 @@ def get_corpus():
             'author': text.author_id
         }
         corpus_list.append(text_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'text': corpus_list
-        }
-    }
+    response_object = {'status': 'success', 'data': {'text': corpus_list}}
     return jsonify(response_object), 200
 
 
@@ -125,17 +100,14 @@ def add_corpus():
     """Add a text in corpus"""
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     code = 401
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-            response_object['message'] = 'Provide a valid auth token.'
-            code = 403
-            return jsonify(response_object), code
+        response_object['message'] = 'Provide a valid auth token.'
+        code = 403
+        return jsonify(response_object), code
     auth_token = auth_header.split(" ")[1]
     user_id = User.decode_auth_token(auth_token)
     if isinstance(user_id, str):
@@ -149,10 +121,14 @@ def add_corpus():
     try:
         text = Corpus_text.query.filter_by(title=title).first()
         if not text:
-            db.session.add(Corpus_text(title=title,
-                                       filename=filename,
-                                       category_id=category_id,
-                                       author_id=user_id))
+            db.session.add(
+                Corpus_text(
+                    title=title,
+                    filename=filename,
+                    category_id=category_id,
+                    author_id=user_id
+                )
+            )
 
             db.session.commit()
             response_object = {
@@ -168,8 +144,5 @@ def add_corpus():
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
         db.session.rollback()
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400

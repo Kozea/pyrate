@@ -1,8 +1,9 @@
 import datetime
+
 import jwt
 from flask import current_app
 
-from pyrate_api import db, bcrypt
+from .. import bcrypt, db
 
 
 class User(db.Model):

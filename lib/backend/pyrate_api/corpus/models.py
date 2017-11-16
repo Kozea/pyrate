@@ -1,10 +1,9 @@
 import datetime
 
-from pyrate_api import db
-from pyrate_api.users.models import User
+from .. import db
 
 
-class Corpus_category (db.Model):
+class Corpus_category(db.Model):
     __tablename__ = "corpus_categories"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     label = db.Column(db.String(80), unique=True, nullable=False)
@@ -23,21 +22,31 @@ class Corpus_text(db.Model):
     filename = db.Column(db.String(80), nullable=False)
     creation_date = db.Column(db.DateTime, nullable=False)
 
-    category_id = db.Column(db.Integer, db.ForeignKey('corpus_categories.id'),
-                            nullable=False)
-    corpus_category = db.relationship('Corpus_category',
-                                      backref=db.backref('corpus_texts', lazy=True))
+    category_id = db.Column(
+        db.Integer, db.ForeignKey('corpus_categories.id'), nullable=False
+    )
+    corpus_category = db.relationship(
+        'Corpus_category', backref=db.backref('corpus_texts', lazy=True)
+    )
 
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                          nullable=False)
-    user = db.relationship('User',
-                           backref=db.backref('corpus_texts', lazy=True))
+    author_id = db.Column(
+        db.Integer, db.ForeignKey('users.id'), nullable=False
+    )
+    user = db.relationship(
+        'User', backref=db.backref('corpus_texts', lazy=True)
+    )
 
     def __repr__(self):
         return '<Corpus_text %r>' % self.title
 
-    def __init__(self, title, filename, category_id, author_id,
-                 creation_date=datetime.datetime.utcnow()):
+    def __init__(
+            self,
+            title,
+            filename,
+            category_id,
+            author_id,
+            creation_date=datetime.datetime.utcnow()
+    ):
         self.title = title
         self.filename = filename
         self.category_id = category_id

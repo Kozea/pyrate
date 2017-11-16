@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import exc, or_
 
+from .. import bcrypt, db
 from .models import User
-from pyrate_api import db, bcrypt
 
 auth_blueprint = Blueprint('auth', __name__)
 
