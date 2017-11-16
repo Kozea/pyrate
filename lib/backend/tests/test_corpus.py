@@ -1,7 +1,7 @@
 import json
 
 from .base import BaseTestCase
-from .utils import add_category, add_user, add_corpus_text
+from .utils import add_category, add_corpus_text, add_user
 
 
 class TestCorpusService(BaseTestCase):
@@ -79,8 +79,8 @@ class TestCorpusService(BaseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertIn('error', data['status'])
-            self.assertIn('Category 999999999 does not exist.', data['message'])
-
+            self.assertIn('Category 999999999 does not exist.',
+                          data['message'])
 
     def test_update_category(self):
         """=> Ensure an existing category can be updated in the database."""
@@ -123,7 +123,8 @@ class TestCorpusService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
-            self.assertIn('Sorry. That category does not exist.', data['message'])
+            self.assertIn('Sorry. That category does not exist.',
+                          data['message'])
             self.assertIn('fail', data['status'])
 
     def test_add_text_in_corpus(self):
@@ -142,11 +143,10 @@ class TestCorpusService(BaseTestCase):
             )
 
             response = self.client.post('/corpus',
-                data=json.dumps(dict(
-                    title='les miserables',
-                    filename='les_miserables.txt',
-                    category_id=1
-                )),
+                data=json.dumps(dict(title='les miserables',
+                                     filename='les_miserables.txt',
+                                     category_id=1
+                                    )),
                 content_type='application/json',
                 headers=dict(
                     Authorization='Bearer ' + json.loads(
