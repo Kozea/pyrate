@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
 
 from .. import db
-from ..users.models import User
 from ..utils import authenticate
 from .models import Corpus_category, Corpus_text
 
@@ -23,7 +22,7 @@ def get_corpus_categories():
 
 @corpus_blueprint.route('/categories', methods=['POST'])
 @authenticate
-def add_corpus_category(resp):
+def add_corpus_category(user_id):
     """Add a new corpus category"""
     post_data = request.get_json()
     if not post_data:
@@ -74,7 +73,7 @@ def get_corpus_category(cat_id):
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['DELETE'])
 @authenticate
-def delete_corpus_category(resp, cat_id):
+def delete_corpus_category(user_id, cat_id):
     """Delete one corpus category"""
     cat = Corpus_category.query.filter_by(id=cat_id).first()
     if not cat:
@@ -94,7 +93,7 @@ def delete_corpus_category(resp, cat_id):
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['PUT'])
 @authenticate
-def update_corpus_category(resp, cat_id):
+def update_corpus_category(user_id, cat_id):
     """Update a corpus category"""
     post_data = request.get_json()
     if not post_data:
@@ -144,23 +143,12 @@ def get_corpus():
 
 @corpus_blueprint.route('/corpus', methods=['POST'])
 @authenticate
-def add_corpus_text(resp):
+def add_corpus_text(user_id):
     """Add a text in corpus"""
     post_data = request.get_json()
     if not post_data:
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
-    code = 401
-    auth_header = request.headers.get('Authorization')
-    if not auth_header:
-        response_object['message'] = 'Provide a valid auth token.'
-        code = 403
-        return jsonify(response_object), code
-    auth_token = auth_header.split(" ")[1]
-    user_id = User.decode_auth_token(auth_token)
-    if isinstance(user_id, str):
-        response_object['message'] = user_id
-        return jsonify(response_object), code
 
     title = post_data.get('title')
     filename = post_data.get('filename')
@@ -177,7 +165,6 @@ def add_corpus_text(resp):
                     author_id=user_id
                 )
             )
-
             db.session.commit()
             response_object = {
                 'status': 'success',
@@ -198,7 +185,7 @@ def add_corpus_text(resp):
 
 @corpus_blueprint.route('/corpus/<text_id>', methods=['DELETE'])
 @authenticate
-def delete_corpus_text(resp, text_id):
+def delete_corpus_text(user_id, text_id):
     """Delete a text from a corpus"""
     text = Corpus_text.query.filter_by(id=text_id).first()
     if not text:
