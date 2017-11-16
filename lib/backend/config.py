@@ -16,7 +16,7 @@ class DevelopmentConfig(BaseConfig):
     """Development configuration"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:////' + os.path.join(
-        current_app.root_path, 'db/pyrate.db'
+        current_app.root_path, 'database/pyrate.db'
     )
     SECRET_KEY = 'development key'
     USERNAME = 'admin'
@@ -28,7 +28,7 @@ class TestingConfig(BaseConfig):
     """Development configuration"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:////' + os.path.join(
-        current_app.root_path, 'db/pyrate_test.db'
+        current_app.root_path, 'database/pyrate_test.db'
     )
     SECRET_KEY = 'test key'
     USERNAME = 'admin'

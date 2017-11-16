@@ -2,8 +2,9 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
 
 from .models import Corpus_text, Corpus_category
-from pyrate_api import db
-from pyrate_api.users.models import User
+from ..users.models import User
+from .. import db
+
 
 corpus_blueprint = Blueprint('corpus', __name__)
 
