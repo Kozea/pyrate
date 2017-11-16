@@ -103,7 +103,6 @@ def delete_corpus_category(cat_id):
     return jsonify(response_object), 200
 
 
-
 @corpus_blueprint.route('/corpus', methods=['GET'])
 def get_corpus():
     """Get all texts"""
@@ -129,7 +128,7 @@ def get_corpus():
 
 
 @corpus_blueprint.route('/corpus', methods=['POST'])
-def add_corpus():
+def add_corpus_text():
     """Add a text in corpus"""
     post_data = request.get_json()
     if not post_data:
@@ -181,3 +180,22 @@ def add_corpus():
             'message': 'Invalid payload.'
         }
         return jsonify(response_object), 400
+
+
+@corpus_blueprint.route('/corpus/<text_id>', methods=['DELETE'])
+def delete_corpus_text(text_id):
+    """Delete a text from a corpus"""
+    text = Corpus_text.query.filter_by(id=text_id).first()
+    if not text:
+        response_object = {
+            'status': 'error',
+            'message': f'Text {text_id} does not exist.'
+        }
+        return jsonify(response_object), 400
+
+    Corpus_text.query.filter_by(id=text_id).delete()
+    response_object = {
+        'status': 'success',
+        'message': f'Corpus text {text_id} deleted.'
+    }
+    return jsonify(response_object), 200

@@ -1,7 +1,7 @@
 import json
 
 from pyrate_api.tests.base import BaseTestCase
-from pyrate_api.tests.utils import add_category, add_user
+from pyrate_api.tests.utils import add_category, add_user, add_corpus_text
 
 
 class TestCorpusService(BaseTestCase):
@@ -114,3 +114,30 @@ class TestCorpusService(BaseTestCase):
             self.assertTrue(
                 data['message'] == f'Text "les miserables" was added!')
             self.assertEqual(response.status_code, 201)
+
+    def test_delete_corpus(self):
+        """=> Ensure delete a text from a corpus behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans')
+        text = add_corpus_text('les miserables',
+                               'les_miserables.txt',
+                               cat.id,
+                               user.id)
+
+        with self.client:
+            response = self.client.delete(f'/corpus/{text.id}')
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+            self.assertIn('Corpus text 1 deleted.', data['message'])
+
+    def test_delete_not_exiting_corpus(self):
+        """=> Ensure error is thrown if a text does not exist"""
+        with self.client:
+            response = self.client.delete('/corpus/999999999')
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('error', data['status'])
+            self.assertIn('Text 999999999 does not exist.', data['message'])
