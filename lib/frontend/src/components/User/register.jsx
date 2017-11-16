@@ -25,7 +25,7 @@ export default function Register() {
       <br />
 
       <p>
-        La création d&apos;un compte implique que vous avez lu et accepté les{' '}
+        La création d&apos;un compte implique que vous acceptez les{' '}
         <a href="#">termes et conditions d&apos;utilisation</a>.
       </p>
       <br />
