@@ -1,13 +1,13 @@
 from flask_testing import TestCase
 
-from pyrate_api import create_app, db
+from .. import app, db
 
-app = create_app()
+# app = create_app()
 
 
 class BaseTestCase(TestCase):
     def create_app(self):
-        app.config.from_object('pyrate_api.config.TestingConfig')
+        app.config.from_object('.config.TestingConfig')
         return app
 
     def setUp(self):

@@ -1,6 +1,6 @@
-from pyrate_api.users.models import User
-from pyrate_api.corpus.models import Corpus_category, Corpus_text
-from pyrate_api import db
+from ..users.models import User
+from ..corpus.models import Corpus_category, Corpus_text
+from .. import db
 
 
 def add_user(username, email, password):

@@ -1,8 +1,8 @@
 import json
 import time
 
-from pyrate_api.tests.base import BaseTestCase
-from pyrate_api.tests.utils import add_user
+from .base import BaseTestCase
+from .utils import add_user
 
 
 class TestAuthBlueprint(BaseTestCase):

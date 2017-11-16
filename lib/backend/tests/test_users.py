@@ -1,8 +1,8 @@
 import json
 
-from pyrate_api.tests.base import BaseTestCase
-from pyrate_api.users.models import User
-from pyrate_api.tests.utils import add_user
+from .base import BaseTestCase
+from ..users.models import User
+from .utils import add_user
 
 
 class TestUserService(BaseTestCase):

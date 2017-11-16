@@ -1,7 +1,7 @@
 import json
 
-from pyrate_api.tests.base import BaseTestCase
-from pyrate_api.tests.utils import add_category, add_user, add_corpus_text
+from .base import BaseTestCase
+from .utils import add_category, add_user, add_corpus_text
 
 
 class TestCorpusService(BaseTestCase):
