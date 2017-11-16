@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import exc, or_
 
 from .. import bcrypt, db
+from ..utils import authenticate
 from .models import User
 
 auth_blueprint = Blueprint('auth', __name__)
@@ -83,7 +84,8 @@ def login_user():
 
 
 @auth_blueprint.route('/auth/logout', methods=['GET'])
-def logout_user():
+@authenticate
+def logout_user(resp):
     # get auth token
     auth_header = request.headers.get('Authorization')
     if auth_header:

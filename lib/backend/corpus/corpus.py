@@ -3,6 +3,7 @@ from sqlalchemy import exc
 
 from .. import db
 from ..users.models import User
+from ..utils import authenticate
 from .models import Corpus_category, Corpus_text
 
 corpus_blueprint = Blueprint('corpus', __name__)
@@ -21,7 +22,8 @@ def get_corpus_categories():
 
 
 @corpus_blueprint.route('/categories', methods=['POST'])
-def add_corpus_category():
+@authenticate
+def add_corpus_category(resp):
     """Add a new corpus category"""
     post_data = request.get_json()
     if not post_data:
@@ -71,7 +73,8 @@ def get_corpus_category(cat_id):
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['DELETE'])
-def delete_corpus_category(cat_id):
+@authenticate
+def delete_corpus_category(resp, cat_id):
     """Delete one corpus category"""
     cat = Corpus_category.query.filter_by(id=cat_id).first()
     if not cat:
@@ -90,7 +93,8 @@ def delete_corpus_category(cat_id):
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['PUT'])
-def update_corpus_category(cat_id):
+@authenticate
+def update_corpus_category(resp, cat_id):
     """Update a corpus category"""
     post_data = request.get_json()
     if not post_data:
@@ -139,7 +143,8 @@ def get_corpus():
 
 
 @corpus_blueprint.route('/corpus', methods=['POST'])
-def add_corpus_text():
+@authenticate
+def add_corpus_text(resp):
     """Add a text in corpus"""
     post_data = request.get_json()
     if not post_data:
@@ -192,7 +197,8 @@ def add_corpus_text():
 
 
 @corpus_blueprint.route('/corpus/<text_id>', methods=['DELETE'])
-def delete_corpus_text(text_id):
+@authenticate
+def delete_corpus_text(resp, text_id):
     """Delete a text from a corpus"""
     text = Corpus_text.query.filter_by(id=text_id).first()
     if not text:

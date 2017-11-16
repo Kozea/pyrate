@@ -9,11 +9,21 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_category(self):
         """=> Ensure a new category can be added to the database."""
+        add_user('test', 'test@test.com', 'test')
         with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
             response = self.client.post(
                 '/categories',
                 data=json.dumps(dict(label='romans')),
                 content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
 
@@ -23,11 +33,21 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_category_no_label(self):
         """=> Ensure error is thrown if a label is not provided."""
+        add_user('test', 'test@test.com', 'test')
         with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
             response = self.client.post(
                 '/categories',
                 data=json.dumps(dict()),
                 content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
 
@@ -59,10 +79,21 @@ class TestCorpusService(BaseTestCase):
 
     def test_delete_category(self):
         """=> Ensure delete a category behaves correctly."""
+        add_user('test', 'test@test.com', 'test')
         cat = add_category('romans')
 
         with self.client:
-            response = self.client.delete(f'/categories/{cat.id}')
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.delete(
+                f'/categories/{cat.id}',
+                headers=dict(Authorization='Bearer ' +
+                             json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 200)
@@ -71,8 +102,20 @@ class TestCorpusService(BaseTestCase):
 
     def test_delete_not_exiting_category(self):
         """=> Ensure error is thrown if a category does not exist"""
+        add_user('test', 'test@test.com', 'test')
+
         with self.client:
-            response = self.client.delete('/categories/999999999')
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.delete(
+                '/categories/999999999',
+                headers=dict(Authorization='Bearer ' +
+                             json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 400)
@@ -83,12 +126,23 @@ class TestCorpusService(BaseTestCase):
 
     def test_update_category(self):
         """=> Ensure an existing category can be updated in the database."""
+        add_user('test', 'test@test.com', 'test')
         cat = add_category('romans')
+
         with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
             response = self.client.put(
                 f'/categories/{cat.id}',
                 data=json.dumps(dict(label='newspapers')),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
@@ -97,11 +151,22 @@ class TestCorpusService(BaseTestCase):
 
     def test_update_category_invalid_json(self):
         """=> Ensure error is thrown if the JSON object is empty."""
+        add_user('test', 'test@test.com', 'test')
+
         with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
             response = self.client.put(
                 '/categories/1',
                 data=json.dumps(dict()),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -110,11 +175,22 @@ class TestCorpusService(BaseTestCase):
 
     def test_update_no_existing_category(self):
         """=> Ensure error is thrown if the category does not exist."""
+        add_user('test', 'test@test.com', 'test')
+
         with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
             response = self.client.put(
                 '/categories/1',
                 data=json.dumps(dict(label='newspapers')),
-                content_type='application/json'
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
@@ -134,7 +210,6 @@ class TestCorpusService(BaseTestCase):
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
-
             response = self.client.post(
                 '/corpus',
                 data=json.dumps(
@@ -166,7 +241,18 @@ class TestCorpusService(BaseTestCase):
         )
 
         with self.client:
-            response = self.client.delete(f'/corpus/{text.id}')
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.delete(
+                f'/corpus/{text.id}',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 200)
@@ -175,8 +261,21 @@ class TestCorpusService(BaseTestCase):
 
     def test_delete_not_exiting_corpus(self):
         """=> Ensure error is thrown if a text does not exist"""
+        add_user('test', 'test@test.com', 'test')
+
         with self.client:
-            response = self.client.delete('/corpus/999999999')
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.delete(
+                '/corpus/999999999',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 400)
