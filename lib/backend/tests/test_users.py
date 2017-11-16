@@ -2,8 +2,8 @@ import json
 
 from lib.backend.users.models import User
 
-from .base import BaseTestCase
-from .utils import add_user
+from base import BaseTestCase
+from utils import add_user
 
 
 class TestUserService(BaseTestCase):
