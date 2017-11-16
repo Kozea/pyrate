@@ -103,6 +103,42 @@ def delete_corpus_category(cat_id):
     return jsonify(response_object), 200
 
 
+@corpus_blueprint.route('/categories/<cat_id>', methods=['PUT'])
+def update_corpus_category(cat_id):
+    """Update a corpus category"""
+    post_data = request.get_json()
+    if not post_data:
+        response_object = {
+            'status': 'fail',
+            'message': 'Invalid payload.'
+        }
+        return jsonify(response_object), 400
+    label = post_data.get('label')
+    try:
+        cat = Corpus_category.query.filter_by(id=cat_id).first()
+        if cat:
+            cat.label = label
+            db.session.commit()
+            response_object = {
+                'status': 'success',
+                'message': 'Category was updated!'
+            }
+            return jsonify(response_object), 200
+        else:
+            response_object = {
+                'status': 'fail',
+                'message': 'Sorry. That category does not exist.'
+            }
+            return jsonify(response_object), 400
+    except (exc.IntegrityError, ValueError, TypeError) as e:
+        db.session().rollback()
+        response_object = {
+            'status': 'fail',
+            'message': 'Invalid payload.'
+        }
+        return jsonify(response_object), 400
+
+
 @corpus_blueprint.route('/corpus', methods=['GET'])
 def get_corpus():
     """Get all texts"""

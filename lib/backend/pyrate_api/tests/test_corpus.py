@@ -81,6 +81,51 @@ class TestCorpusService(BaseTestCase):
             self.assertIn('error', data['status'])
             self.assertIn('Category 999999999 does not exist.', data['message'])
 
+
+    def test_update_category(self):
+        """=> Ensure an existing category can be updated in the database."""
+        cat = add_category('romans')
+        with self.client:
+            response = self.client.put(
+                f'/categories/{cat.id}',
+                data=json.dumps(dict(
+                    label='newspapers'
+                )),
+                content_type='application/json'
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Category was updated!', data['message'])
+            self.assertIn('success', data['status'])
+
+    def test_update_category_invalid_json(self):
+        """=> Ensure error is thrown if the JSON object is empty."""
+        with self.client:
+            response = self.client.put(
+                '/categories/1',
+                data=json.dumps(dict()),
+                content_type='application/json'
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('Invalid payload.', data['message'])
+            self.assertIn('fail', data['status'])
+
+    def test_update_no_existing_category(self):
+        """=> Ensure error is thrown if the category does not exist."""
+        with self.client:
+            response = self.client.put(
+                '/categories/1',
+                data=json.dumps(dict(
+                    label='newspapers'
+                )),
+                content_type='application/json'
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('Sorry. That category does not exist.', data['message'])
+            self.assertIn('fail', data['status'])
+
     def test_add_text_in_corpus(self):
         """=> Ensure add a category behaves correctly."""
         add_user('test', 'test@test.com', 'test')

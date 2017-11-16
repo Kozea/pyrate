@@ -28,7 +28,7 @@ def create_app():
     app.register_blueprint(users_blueprint)
     from pyrate_api.users.auth import auth_blueprint
     app.register_blueprint(auth_blueprint)
-    from pyrate_api.corpus.views import corpus_blueprint
+    from pyrate_api.corpus.corpus import corpus_blueprint
     app.register_blueprint(corpus_blueprint)
 
     return app
