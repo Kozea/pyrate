@@ -1,7 +1,6 @@
 import datetime
 
 from pyrate_api import db
-from pyrate_api.users.models import User
 
 
 class Corpus_category (db.Model):

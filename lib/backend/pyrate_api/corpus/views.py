@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from sqlalchemy import exc
 
 from .models import Corpus_text, Corpus_category
 from pyrate_api import db

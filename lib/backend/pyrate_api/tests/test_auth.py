@@ -1,8 +1,6 @@
 import json
 import time
 
-from pyrate_api import db
-from pyrate_api.users.models import User
 from pyrate_api.tests.base import BaseTestCase
 from pyrate_api.tests.utils import add_user
 

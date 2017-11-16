@@ -1,7 +1,6 @@
 import json
 
 from pyrate_api.tests.base import BaseTestCase
-from pyrate_api.corpus.models import Corpus_category, Corpus_text
 from pyrate_api.tests.utils import add_category, add_user
 
 
@@ -65,7 +64,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus(self):
         """=> Add a text in corpus"""
         add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans')
+        add_category('romans')
 
         with self.client:
 
