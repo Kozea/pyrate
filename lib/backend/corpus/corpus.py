@@ -14,17 +14,9 @@ def get_corpus_categories():
     categories = Corpus_category.query.all()
     categories_list = []
     for category in categories:
-        category_object = {
-            'id': category.id,
-            'label': category.label
-        }
+        category_object = {'id': category.id, 'label': category.label}
         categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'text': categories_list
-        }
-    }
+    response_object = {'status': 'success', 'data': {'text': categories_list}}
     return jsonify(response_object), 200
 
 
@@ -33,10 +25,7 @@ def add_corpus_category():
     """Add a new corpus category"""
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     label = post_data.get('label')
     try:
@@ -57,10 +46,7 @@ def add_corpus_category():
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
         db.session.rollback()
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
 
@@ -108,10 +94,7 @@ def update_corpus_category(cat_id):
     """Update a corpus category"""
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     label = post_data.get('label')
     try:
@@ -132,10 +115,7 @@ def update_corpus_category(cat_id):
             return jsonify(response_object), 400
     except (exc.IntegrityError, ValueError, TypeError) as e:
         db.session().rollback()
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
 
@@ -154,12 +134,7 @@ def get_corpus():
             'author': text.author_id
         }
         corpus_list.append(text_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'text': corpus_list
-        }
-    }
+    response_object = {'status': 'success', 'data': {'text': corpus_list}}
     return jsonify(response_object), 200
 
 
@@ -168,17 +143,14 @@ def add_corpus_text():
     """Add a text in corpus"""
     post_data = request.get_json()
     if not post_data:
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     code = 401
     auth_header = request.headers.get('Authorization')
     if not auth_header:
-            response_object['message'] = 'Provide a valid auth token.'
-            code = 403
-            return jsonify(response_object), code
+        response_object['message'] = 'Provide a valid auth token.'
+        code = 403
+        return jsonify(response_object), code
     auth_token = auth_header.split(" ")[1]
     user_id = User.decode_auth_token(auth_token)
     if isinstance(user_id, str):
@@ -192,10 +164,14 @@ def add_corpus_text():
     try:
         text = Corpus_text.query.filter_by(title=title).first()
         if not text:
-            db.session.add(Corpus_text(title=title,
-                                       filename=filename,
-                                       category_id=category_id,
-                                       author_id=user_id))
+            db.session.add(
+                Corpus_text(
+                    title=title,
+                    filename=filename,
+                    category_id=category_id,
+                    author_id=user_id
+                )
+            )
 
             db.session.commit()
             response_object = {
@@ -211,10 +187,7 @@ def add_corpus_text():
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
         db.session.rollback()
-        response_object = {
-            'status': 'fail',
-            'message': 'Invalid payload.'
-        }
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
 
