@@ -25,9 +25,10 @@ db.init_app(app)
 bcrypt.init_app(app)
 migrate.init_app(app, db)
 
-from .corpus.corpus import corpus_blueprint
-from .users.auth import auth_blueprint
-from .users.users import users_blueprint
+
+from .corpus.corpus import corpus_blueprint  # noqa: E402
+from .users.auth import auth_blueprint  # noqa: E402
+from .users.users import users_blueprint  # noqa: E402
 
 app.register_blueprint(users_blueprint)
 app.register_blueprint(auth_blueprint)
@@ -65,9 +66,7 @@ def recreate_db():
 @app.cli.command()
 def test():
     """Runs the tests without code coverage."""
-    tests = unittest.TestLoader().discover(
-        'lib/backend/tests', pattern='test*.py'
-    )
+    tests = unittest.TestLoader().discover('lib/backend', pattern='test*.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     if result.wasSuccessful():
         return 0
