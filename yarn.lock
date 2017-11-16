@@ -3915,9 +3915,9 @@ koa-send@^4.1.0:
     mz "^2.6.0"
     resolve-path "^1.3.3"
 
-koa-static@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/koa-static/-/koa-static-4.0.1.tgz#b99521ed848d7adb79acae9c824d8d8277a8c4d5"
+koa-static@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/koa-static/-/koa-static-4.0.2.tgz#6cda92d88d771dcaad9f0d825cd94a631c861a1a"
   dependencies:
     debug "^2.6.8"
     koa-send "^4.1.0"
@@ -3951,9 +3951,9 @@ koa@^2.4.1:
     type-is "^1.5.5"
     vary "^1.0.0"
 
-koaze@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/koaze/-/koaze-0.0.2.tgz#7c73279bbce00370674d30ca669aa1ffb84ddccd"
+koaze@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/koaze/-/koaze-0.0.4.tgz#c4bfbbc3c51d192d0b4742001258ff32dcfe8e24"
   dependencies:
     chalk "^2.3.0"
     koa "^2.4.1"
@@ -3961,7 +3961,7 @@ koaze@^0.0.2:
     koa-logger "^3.1.0"
     koa-mount "^3.0.0"
     koa-router "^7.3.0"
-    koa-static "^4.0.1"
+    koa-static "^4.0.2"
     polyfill-service "^3.22.0"
     request "^2.83.0"
 
@@ -7040,9 +7040,9 @@ webpack@^3.8.1:
     webpack-sources "^1.0.1"
     yargs "^8.0.2"
 
-webpackozea@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/webpackozea/-/webpackozea-0.0.2.tgz#bdefd1fa62deba8f049131db75eaef6fa096dc63"
+webpackozea@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/webpackozea/-/webpackozea-0.0.3.tgz#63a8210e2b04b532c107c9e54afd87992673aaa2"
   dependencies:
     babel-minify-webpack-plugin "^0.2.0"
     chalk "^2.3.0"
