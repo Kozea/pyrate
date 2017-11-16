@@ -1,6 +1,6 @@
-from .. import db
-from ..corpus.models import Corpus_category, Corpus_text
-from ..users.models import User
+from lib.backend import db
+from lib.backend.corpus.models import Corpus_category, Corpus_text
+from lib.backend.users.models import User
 
 
 def add_user(username, email, password):

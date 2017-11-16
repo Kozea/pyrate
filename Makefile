@@ -84,7 +84,7 @@ build-server: clean-server
 	$(NPM) run build-server
 
 build: clean lint-node
-		$(MAKE) P="build-server build-client" make-p
+	$(MAKE) P="build-server build-client" make-p
 
 serve-python:
 	$(FLASK) run --with-threads -h $(HOST) -p $(API_PORT)
@@ -106,3 +106,6 @@ run:
 
 serve: env-check clean
 	$(MAKE) P="serve-node-client serve-node-server serve-python" make-p
+
+test-python:
+	$(FLASK) test

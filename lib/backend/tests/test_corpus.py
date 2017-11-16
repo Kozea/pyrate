@@ -1,7 +1,7 @@
 import json
 
-from .base import BaseTestCase
-from .utils import add_category, add_corpus_text, add_user
+from base import BaseTestCase
+from utils import add_category, add_corpus_text, add_user
 
 
 class TestCorpusService(BaseTestCase):

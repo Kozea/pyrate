@@ -1,5 +1,6 @@
 import locale
 import logging
+import unittest
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
@@ -50,3 +51,14 @@ if app.debug or app.config.get('STAGING'):
             'Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
         )
         return response
+
+@app.cli.command()
+def test():
+    """Runs the tests without code coverage."""
+    tests = unittest.TestLoader().discover(
+        'lib/backend/tests', pattern='test*.py'
+    )
+    result = unittest.TextTestRunner(verbosity=2).run(tests)
+    if result.wasSuccessful():
+        return 0
+    return 1
