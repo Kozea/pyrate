@@ -1,14 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom'
+import React from 'react'
+import Login from '../User/login'
+import Register from '../User/register'
 
-let Login = "Login";
+class NavBar extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      showReply: false,
+    }
+  }
 
-const NavBar = (props) => (
-  <div>
-    <h1>PyRaTe</h1>
-    login
-    register
-  </div>
-);
+  renderRoute() {
+    switch (window.location.pathname) {
+      case '/login':
+        return <Login />
+      case '/register':
+        return <Register />
+    }
+  }
 
-export default NavBar;
+  render() {
+    return (
+      <div className="navbar">
+        <h1>PyRaTe</h1>
+        <button onClick={() => (window.location.href = '/login')}>Login</button>
+        <button onClick={() => (window.location.href = '/register')}>
+          Register
+        </button>
+        {this.renderRoute()}
+      </div>
+    )
+  }
+}
+
+export default NavBar
