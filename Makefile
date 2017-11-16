@@ -112,3 +112,6 @@ test-python:
 
 recreate_db:
 	$(FLASK) recreate_db
+
+db:
+	$(FLASK) db ${COMMAND}
