@@ -29,7 +29,7 @@ def get_corpus_categories():
 
 
 @corpus_blueprint.route('/categories', methods=['POST'])
-def add_category():
+def add_corpus_category():
     """Add a new corpus category"""
     post_data = request.get_json()
     if not post_data:
@@ -67,14 +67,21 @@ def add_category():
 @corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
 def get_corpus_category(cat_id):
     """Get one corpus categories"""
-    category = Corpus_category.query.filter_by(id=cat_id).first()
-    response_object = {
-        'status': 'success',
-        'data': {
-            'label': category.label
-        }
-    }
-    return jsonify(response_object), 200
+    response_object = {'status': 'fail', 'message': 'Category does not exist'}
+    try:
+        category = Corpus_category.query.filter_by(id=cat_id).first()
+        if not category:
+            return jsonify(response_object), 404
+        else:
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'label': category.label
+                }
+            }
+            return jsonify(response_object), 200
+    except ValueError:
+        return jsonify(response_object), 404
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['DELETE'])
