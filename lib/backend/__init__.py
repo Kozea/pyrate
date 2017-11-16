@@ -52,6 +52,16 @@ if app.debug or app.config.get('STAGING'):
         )
         return response
 
+
+@app.cli.command()
+def recreate_db():
+    """Recreates a database."""
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
+    print('Database (re)creation done.')
+
+
 @app.cli.command()
 def test():
     """Runs the tests without code coverage."""

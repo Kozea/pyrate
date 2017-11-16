@@ -109,3 +109,6 @@ serve: env-check clean
 
 test-python:
 	$(FLASK) test
+
+recreate_db:
+	$(FLASK) recreate_db
