@@ -7,12 +7,22 @@ class Corpus_category(db.Model):
     __tablename__ = "corpus_categories"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     label = db.Column(db.String(80), unique=True, nullable=False)
+    private = db.Column(db.Boolean, default=False, nullable=False)
+
+    owner_id = db.Column(
+        db.Integer, db.ForeignKey('users.id'), nullable=False
+    )
+    user = db.relationship(
+        'User', backref=db.backref('corpus_categories', lazy=True)
+    )
 
     def __repr__(self):
         return '<Corpus_category %r>' % self.label
 
-    def __init__(self, label):
+    def __init__(self, label, owner_id, private=False):
         self.label = label
+        self.owner_id = owner_id
+        self.private = private
 
 
 class Corpus_text(db.Model):

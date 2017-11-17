@@ -7,7 +7,7 @@ from sqlalchemy import exc
 from werkzeug.utils import secure_filename
 
 from .. import app, db
-from ..utils import allowed_file, authenticate
+from ..utils import allowed_file, authenticate, is_admin
 from .models import Corpus_category, Corpus_text
 
 corpus_blueprint = Blueprint('corpus', __name__)
@@ -34,10 +34,13 @@ def add_corpus_category(user_id):
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     label = post_data.get('label')
+    private = post_data.get('private')
     try:
         category = Corpus_category.query.filter_by(label=label).first()
         if not category:
-            db.session.add(Corpus_category(label=label))
+            db.session.add(Corpus_category(label=label,
+                                           private=private,
+                                           owner_id=user_id))
             db.session.commit()
             response_object = {
                 'status': 'success',
@@ -88,13 +91,20 @@ def delete_corpus_category(user_id, cat_id):
         }
         return jsonify(response_object), 400
 
+    if not is_admin(user_id) and cat.owner_id != user_id:
+        response_object = {
+            'status': 'error',
+            'message': 'You do not have permission to delete this category.'
+        }
+        return jsonify(response_object), 401
+
     try:
         Corpus_text.query.filter_by(category_id=cat_id).delete()
         Corpus_category.query.filter_by(id=cat_id).delete()
         db.session.commit()
 
         dirpath = os.path.join(app.config['UPLOAD_FOLDER'], str(cat_id))
-        shutil.rmtree(dirpath)
+        shutil.rmtree(dirpath, ignore_errors=True)
 
         response_object = {
             'status': 'success',
@@ -116,22 +126,30 @@ def update_corpus_category(user_id, cat_id):
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
     label = post_data.get('label')
+
+    cat = Corpus_category.query.filter_by(id=cat_id).first()
+    if not cat:
+        response_object = {
+            'status': 'error',
+            'message': f'Category {cat_id} does not exist.'
+        }
+        return jsonify(response_object), 400
+
+    if not is_admin(user_id) and cat.owner_id != user_id:
+        response_object = {
+            'status': 'error',
+            'message': 'You do not have permission to update this category.'
+        }
+        return jsonify(response_object), 401
+
     try:
-        cat = Corpus_category.query.filter_by(id=cat_id).first()
-        if cat:
-            cat.label = label
-            db.session.commit()
-            response_object = {
-                'status': 'success',
-                'message': 'Category was updated!'
-            }
-            return jsonify(response_object), 200
-        else:
-            response_object = {
-                'status': 'fail',
-                'message': 'Sorry. That category does not exist.'
-            }
-            return jsonify(response_object), 400
+        cat.label = label
+        db.session.commit()
+        response_object = {
+            'status': 'success',
+            'message': 'Category was updated!'
+        }
+        return jsonify(response_object), 200
     except (exc.IntegrityError, ValueError, TypeError) as e:
         db.session().rollback()
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
@@ -229,12 +247,21 @@ def add_corpus_text(user_id):
 def delete_corpus_text(user_id, text_id):
     """Delete a text from a corpus"""
     text = Corpus_text.query.filter_by(id=text_id).first()
+
     if not text:
         response_object = {
             'status': 'error',
             'message': f'Text {text_id} does not exist.'
         }
         return jsonify(response_object), 400
+
+    cat = Corpus_category.query.filter_by(id=text.category_id).first()
+    if not is_admin(user_id) and cat.owner_id != user_id:
+        response_object = {
+            'status': 'error',
+            'message': 'You do not have permission to delete this text.'
+        }
+        return jsonify(response_object), 401
 
     filepath = text.filename
 

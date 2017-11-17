@@ -10,8 +10,10 @@ def add_user(username, email, password):
     return user
 
 
-def add_category(label):
-    cat = Corpus_category(label=label)
+def add_category(label, owner_id, private=False):
+    cat = Corpus_category(label=label,
+                          owner_id=owner_id,
+                          private=private)
     db.session.add(cat)
     db.session.commit()
     return cat

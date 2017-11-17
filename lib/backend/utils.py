@@ -35,3 +35,8 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in \
            app.config.get('TEXT_ALLOWED_EXTENSIONS')
+
+
+def is_admin(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    return user.admin

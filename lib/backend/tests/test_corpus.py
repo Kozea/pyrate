@@ -4,6 +4,8 @@ from base import BaseTestCase
 from io import BytesIO
 from utils import add_category, add_corpus_text, add_user
 
+from lib.backend import db
+
 
 class TestCorpusService(BaseTestCase):
     """Tests for the Corpus Service."""
@@ -58,7 +60,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_get_category(self):
         """=> Ensure get a category behaves correctly."""
-        cat = add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             response = self.client.get(f'/categories/{cat.id}')
@@ -80,8 +83,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_delete_category(self):
         """=> Ensure delete a category behaves correctly."""
-        add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -100,6 +103,62 @@ class TestCorpusService(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('success', data['status'])
             self.assertIn('Category 1 deleted.', data['message'])
+
+    def test_delete_category_admin(self):
+        """=> Ensure delete a category by admin behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        admin = add_user('admin', 'admin@admin.com', 'admin')
+        admin.admin = True
+        db.session.commit()
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                content_type='application/json'
+            )
+
+            response = self.client.delete(
+                f'/categories/{cat.id}',
+                headers=dict(Authorization='Bearer ' +
+                     json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+            self.assertIn('Category 1 deleted.', data['message'])
+
+    def test_delete_category_no_admin(self):
+        """=> Ensure delete a category by admin behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        user2 = add_user('another', 'another@another.com', 'another')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='another@another.com',
+                                     password='another')),
+                content_type='application/json'
+            )
+
+            response = self.client.delete(
+                f'/categories/{cat.id}',
+                headers=dict(Authorization='Bearer ' +
+                     json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 401)
+            self.assertIn('error', data['status'])
+            self.assertIn('You do not have permission to delete this category.',
+                          data['message'])
 
     def test_delete_not_exiting_category(self):
         """=> Ensure error is thrown if a category does not exist"""
@@ -127,8 +186,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_update_category(self):
         """=> Ensure an existing category can be updated in the database."""
-        add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -149,6 +208,65 @@ class TestCorpusService(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('Category was updated!', data['message'])
             self.assertIn('success', data['status'])
+
+
+    def test_update_category_admin(self):
+        """=> Ensure an existing category can be updated in the database."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        admin = add_user('admin', 'admin@admin.com', 'admin')
+        admin.admin = True
+        db.session.commit()
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                content_type='application/json'
+            )
+            response = self.client.put(
+                f'/categories/{cat.id}',
+                data=json.dumps(dict(label='newspapers')),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Category was updated!', data['message'])
+            self.assertIn('success', data['status'])
+
+    def test_update_category_no_admin(self):
+        """=> Ensure an existing category can't be updated in the database."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        user2 = add_user('another', 'another@another.com', 'another')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='another@another.com',
+                                     password='another')),
+                content_type='application/json'
+            )
+            response = self.client.put(
+                f'/categories/{cat.id}',
+                data=json.dumps(dict(label='newspapers')),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 401)
+            self.assertIn('You do not have permission to update this category.',
+                          data['message'])
+            self.assertIn('error', data['status'])
 
     def test_update_category_invalid_json(self):
         """=> Ensure error is thrown if the JSON object is empty."""
@@ -196,14 +314,14 @@ class TestCorpusService(BaseTestCase):
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
             self.assertIn(
-                'Sorry. That category does not exist.', data['message']
+                'Category 1 does not exist.', data['message']
             )
-            self.assertIn('fail', data['status'])
+            self.assertIn('error', data['status'])
 
     def test_add_text_in_corpus(self):
         """=> Ensure add a text in corpus behaves correctly."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -232,8 +350,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_duplicate_text_in_corpus(self):
         """=> Ensure error is thrown if a duplicate text is added."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -276,8 +394,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_unallowed_file(self):
         """=> Ensure error is thrown if text file extension is not allowed."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -308,8 +426,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_empty_file(self):
         """=> Ensure error is thrown if text file is empty."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -340,8 +458,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_no_file(self):
         """=> Ensure error is thrown if no text file is provided."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -372,8 +490,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_no_file2(self):
         """=> Ensure error is thrown if no text file is provided."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -403,8 +521,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_no_data(self):
         """=> Ensure error is thrown if text details are not provided."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -434,8 +552,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_no_form(self):
         """=> Ensure error is thrown if the payload is not valid."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -462,8 +580,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_without_title(self):
         """=> Ensure error is thrown if text title not provided."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -493,8 +611,8 @@ class TestCorpusService(BaseTestCase):
 
     def test_add_text_in_corpus_without_category(self):
         """=> Ensure error is thrown if text category not provided."""
-        add_user('test', 'test@test.com', 'test')
-        add_category('romans')
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -525,7 +643,7 @@ class TestCorpusService(BaseTestCase):
     def test_delete_corpus(self):
         """=> Ensure delete a text from a corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans')
+        cat = add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -557,6 +675,86 @@ class TestCorpusService(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertIn('success', data['status'])
             self.assertIn('Corpus text 1 deleted.', data['message'])
+
+    def test_delete_corpus_admin(self):
+        """=> Ensure delete a text from a corpus behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        admin = add_user('admin', 'admin@admin.com', 'admin')
+        admin.admin = True
+        db.session.commit()
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            response = self.client.delete(
+                f'/corpus/1',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+            self.assertIn('Corpus text 1 deleted.', data['message'])
+
+    def test_delete_corpus_no_admin(self):
+        """=> Ensure delete a text from a corpus behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('romans', user.id)
+
+        user2 = add_user('another', 'another@another.com', 'another')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='another@another.com',
+                                     password='another')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            response = self.client.delete(
+                f'/corpus/1',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 401)
+            self.assertIn('error', data['status'])
+            self.assertIn('You do not have permission to delete this text.',
+                          data['message'])
 
     def test_delete_not_exiting_corpus(self):
         """=> Ensure error is thrown if a text does not exist"""
