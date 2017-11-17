@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
@@ -87,12 +88,23 @@ def delete_corpus_category(user_id, cat_id):
         }
         return jsonify(response_object), 400
 
-    Corpus_category.query.filter_by(id=cat_id).delete()
-    response_object = {
-        'status': 'success',
-        'message': f'Category {cat_id} deleted.'
-    }
-    return jsonify(response_object), 200
+    try:
+        Corpus_text.query.filter_by(category_id=cat_id).delete()
+        Corpus_category.query.filter_by(id=cat_id).delete()
+        db.session.commit()
+
+        dirpath = os.path.join(app.config['UPLOAD_FOLDER'], str(cat_id))
+        shutil.rmtree(dirpath)
+
+        response_object = {
+            'status': 'success',
+            'message': f'Category {cat_id} deleted.'
+        }
+        return jsonify(response_object), 200
+    except (exc.IntegrityError, ValueError, TypeError, OSError) as e:
+        db.session().rollback()
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
+        return jsonify(response_object), 400
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['PUT'])
@@ -224,9 +236,20 @@ def delete_corpus_text(user_id, text_id):
         }
         return jsonify(response_object), 400
 
-    Corpus_text.query.filter_by(id=text_id).delete()
-    response_object = {
-        'status': 'success',
-        'message': f'Corpus text {text_id} deleted.'
-    }
-    return jsonify(response_object), 200
+    filepath = text.filename
+
+    try:
+        Corpus_text.query.filter_by(id=text_id).delete()
+        db.session.commit()
+
+        os.remove(filepath)
+
+        response_object = {
+            'status': 'success',
+            'message': f'Corpus text {text_id} deleted.'
+        }
+        return jsonify(response_object), 200
+    except (exc.IntegrityError, ValueError, TypeError, OSError) as e:
+        db.session().rollback()
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
+        return jsonify(response_object), 400

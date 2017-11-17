@@ -526,9 +526,6 @@ class TestCorpusService(BaseTestCase):
         """=> Ensure delete a text from a corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
         cat = add_category('romans')
-        text = add_corpus_text(
-            'les miserables', 'les_miserables.txt', cat.id, user.id
-        )
 
         with self.client:
             resp_login = self.client.post(
@@ -536,8 +533,20 @@ class TestCorpusService(BaseTestCase):
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
             response = self.client.delete(
-                f'/corpus/{text.id}',
+                f'/corpus/1',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
