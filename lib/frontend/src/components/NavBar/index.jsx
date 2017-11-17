@@ -1,11 +1,5 @@
 import React from 'react'
 
-import Login from '../User/login'
-import Register from '../User/register'
-import Categories from '../Corpus/categories'
-import Corpus from '../Corpus/corpustexts'
-import Texts from '../Corpus/texts'
-
 class NavBar extends React.Component {
   constructor() {
     super()
@@ -14,33 +8,31 @@ class NavBar extends React.Component {
     }
   }
 
-  renderRoute() {
-    switch (window.location.pathname) {
-      case '/login':
-        return <Login />
-      case '/register':
-        return <Register />
-      case '/categories':
-        return <Categories />
-      case '/corpustexts':
-        return <Corpus />
-      case '/texts':
-        return <Texts />
-    }
-  }
-
   render() {
     return (
-      <div className="navbar">
+      <header>
         <h1>PyRaTe</h1>
-        <button onClick={() => (window.location.href = '/login')}>
-          Se connecter
-        </button>
-        <button onClick={() => (window.location.href = '/register')}>
-          S&apos;inscrire
-        </button>
-        {this.renderRoute()}
-      </div>
+        <ul id="menu_horizontal">
+          <li className="bouton_gauche">
+            <a href="/">Accueil</a>
+          </li>
+          <li className="bouton_gauche">
+            <a href="/texts">Textes</a>
+          </li>
+          <li className="bouton_gauche">
+            <a href="/corpustexts">Corpus</a>
+          </li>
+          <li className="bouton_gauche">
+            <a href="/categories">Catégories</a>
+          </li>
+          <li className="bouton_droite">
+            <a href="/login">Se connecter</a>
+          </li>
+          <li className="bouton_droite">
+            <a href="/register">S&apos;inscrire</a>
+          </li>
+        </ul>
+      </header>
     )
   }
 }

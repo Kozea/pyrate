@@ -23,7 +23,6 @@ export default function Register() {
         required
       />
       <br />
-
       <p>
         La création d&apos;un compte implique que vous acceptez les{' '}
         <a href="#">termes et conditions d&apos;utilisation</a>.

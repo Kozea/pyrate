@@ -1,0 +1,30 @@
+h1
+{
+  text-align:center;
+}
+
+header
+{
+  border:3px double;
+}
+
+label
+{
+  font-weight: bold;
+}
+
+/* Ci-dessous: pour le 'menu' qui est dans la 'NavBar' */
+
+ul#menu_horizontal{
+height : 20px;
+list-style-type : none;
+}
+ul#menu_horizontal li {
+padding : 0 0.5em;
+}
+li.bouton_gauche {
+float : left;
+}
+li.bouton_droite {
+float : right;
+}
