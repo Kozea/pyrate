@@ -15,6 +15,8 @@ node_modules/
 # Pyrate
 lib/backend/application-custom.cfg
 lib/backend/database/pyrate*.db
+lib/backend/uploads/*/*.txt
+lib/backend/uploads/*/*.pdf
 lib/frontend/assets/
 lib/frontend/static/
 

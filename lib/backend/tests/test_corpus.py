@@ -1,6 +1,7 @@
 import json
 
 from base import BaseTestCase
+from io import BytesIO
 from utils import add_category, add_corpus_text, add_user
 
 
@@ -200,7 +201,7 @@ class TestCorpusService(BaseTestCase):
             self.assertIn('fail', data['status'])
 
     def test_add_text_in_corpus(self):
-        """=> Ensure add a category behaves correctly."""
+        """=> Ensure add a text in corpus behaves correctly."""
         add_user('test', 'test@test.com', 'test')
         add_category('romans')
 
@@ -212,16 +213,13 @@ class TestCorpusService(BaseTestCase):
             )
             response = self.client.post(
                 '/corpus',
-                data=json.dumps(
-                    dict(
-                        title='les miserables',
-                        filename='les_miserables.txt',
-                        category_id=1
-                    )
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
                 ),
-                content_type='application/json',
                 headers=dict(
-                    Authorization='Bearer ' +
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
                 )
             )
@@ -231,6 +229,298 @@ class TestCorpusService(BaseTestCase):
                 data['message'] == f'Text "les miserables" was added!'
             )
             self.assertEqual(response.status_code, 201)
+
+    def test_add_duplicate_text_in_corpus(self):
+        """=> Ensure error is thrown if a duplicate text is added."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'Sorry. A text with the same title already exists.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_unallowed_file(self):
+        """=> Ensure error is thrown if text file extension is not allowed."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.aaaa'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'File extension not allowed.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_empty_file(self):
+        """=> Ensure error is thrown if text file is empty."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(), ""),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'No selected file.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_no_file(self):
+        """=> Ensure error is thrown if no text file is provided."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file="",
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'No file part.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_no_file2(self):
+        """=> Ensure error is thrown if no text file is provided."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'No file part.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_no_data(self):
+        """=> Ensure error is thrown if text details are not provided."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt')
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'Invalid payload.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_no_form(self):
+        """=> Ensure error is thrown if the payload is not valid."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'Invalid payload.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_without_title(self):
+        """=> Ensure error is thrown if text title not provided."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'Invalid payload.'
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_add_text_in_corpus_without_category(self):
+        """=> Ensure error is thrown if text category not provided."""
+        add_user('test', 'test@test.com', 'test')
+        add_category('romans')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "Les miserables"}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'fail')
+            self.assertTrue(
+                data['message'] == f'Invalid payload.'
+            )
+            self.assertEqual(response.status_code, 400)
 
     def test_delete_corpus(self):
         """=> Ensure delete a text from a corpus behaves correctly."""

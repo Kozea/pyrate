@@ -151,9 +151,13 @@ def add_corpus_text(user_id):
     """Add a text in corpus"""
 
     code = 400
-    post_data = json.loads(request.form["data"])
+    if not request.form:
+        response_object = {'status': 'fail', 'message': 'Invalid payload.'}
+        return jsonify(response_object), code
 
-    if not post_data:
+    post_data = json.loads(request.form["data"])
+    if not post_data or 'title' not in post_data \
+            or 'category_id' not in post_data:
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), code
 
@@ -161,15 +165,15 @@ def add_corpus_text(user_id):
     category_id = post_data['category_id']
 
     if 'file' not in request.files:
-        response_object = {'status': 'fail', 'message': 'No file part'}
+        response_object = {'status': 'fail', 'message': 'No file part.'}
         return jsonify(response_object), code
     file = request.files['file']
     if file.filename == '':
-        response_object = {'status': 'fail', 'message': 'No selected file'}
+        response_object = {'status': 'fail', 'message': 'No selected file.'}
         return jsonify(response_object), code
     if not allowed_file(file.filename):
         response_object = {'status': 'fail',
-                           'message': 'File extension not allowed'}
+                           'message': 'File extension not allowed.'}
         return jsonify(response_object), code
 
     filename = secure_filename(file.filename)
