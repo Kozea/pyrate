@@ -1,8 +1,12 @@
+import json
+import os
+
 from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
+from werkzeug.utils import secure_filename
 
-from .. import db
-from ..utils import authenticate
+from .. import app, db
+from ..utils import allowed_file, authenticate
 from .models import Corpus_category, Corpus_text
 
 corpus_blueprint = Blueprint('corpus', __name__)
@@ -145,22 +149,43 @@ def get_corpus():
 @authenticate
 def add_corpus_text(user_id):
     """Add a text in corpus"""
-    post_data = request.get_json()
+
+    code = 400
+    post_data = json.loads(request.form["data"])
+
     if not post_data:
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
-        return jsonify(response_object), 400
+        return jsonify(response_object), code
 
-    title = post_data.get('title')
-    filename = post_data.get('filename')
-    category_id = post_data.get('category_id')
+    title = post_data['title']
+    category_id = post_data['category_id']
+
+    if 'file' not in request.files:
+        response_object = {'status': 'fail', 'message': 'No file part'}
+        return jsonify(response_object), code
+    file = request.files['file']
+    if file.filename == '':
+        response_object = {'status': 'fail', 'message': 'No selected file'}
+        return jsonify(response_object), code
+    if not allowed_file(file.filename):
+        response_object = {'status': 'fail',
+                           'message': 'File extension not allowed'}
+        return jsonify(response_object), code
+
+    filename = secure_filename(file.filename)
+    dirpath = os.path.join(app.config['UPLOAD_FOLDER'], str(category_id))
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+    filepath = os.path.join(dirpath, filename)
 
     try:
+        file.save(filepath)
         text = Corpus_text.query.filter_by(title=title).first()
         if not text:
             db.session.add(
                 Corpus_text(
                     title=title,
-                    filename=filename,
+                    filename=filepath,
                     category_id=category_id,
                     author_id=user_id
                 )
@@ -174,13 +199,13 @@ def add_corpus_text(user_id):
         else:
             response_object = {
                 'status': 'fail',
-                'message': 'Sorry. A text with same title already exists.'
+                'message': 'Sorry. A text with the same title already exists.'
             }
-            return jsonify(response_object), 400
+            return jsonify(response_object), code
     except exc.IntegrityError as e:
         db.session.rollback()
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
-        return jsonify(response_object), 400
+        return jsonify(response_object), code
 
 
 @corpus_blueprint.route('/corpus/<text_id>', methods=['DELETE'])

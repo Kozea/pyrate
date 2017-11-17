@@ -11,6 +11,10 @@ class BaseConfig:
     BCRYPT_LOG_ROUNDS = 13
     TOKEN_EXPIRATION_DAYS = 30
     TOKEN_EXPIRATION_SECONDS = 0
+    UPLOAD_FOLDER = os.path.join(
+        current_app.root_path, 'uploads'
+    )
+    TEXT_ALLOWED_EXTENSIONS = set(['txt', 'pdf'])
 
 
 class DevelopmentConfig(BaseConfig):
