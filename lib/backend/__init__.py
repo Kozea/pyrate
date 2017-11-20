@@ -12,6 +12,7 @@ locale.setlocale(locale.LC_ALL, 'fr_FR')
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 migrate = Migrate()
+appLog = logging.getLogger('pyrate')
 
 # instantiate the app
 app = Flask(__name__)
@@ -24,7 +25,6 @@ with app.app_context():
 db.init_app(app)
 bcrypt.init_app(app)
 migrate.init_app(app, db)
-
 
 from .corpus.corpus import corpus_blueprint  # noqa: E402
 from .users.auth import auth_blueprint  # noqa: E402
@@ -39,6 +39,7 @@ if app.debug:
     logging.getLogger('sqlalchemy'
                       ).handlers = logging.getLogger('werkzeug').handlers
     logging.getLogger('sqlalchemy.orm').setLevel(logging.WARNING)
+    appLog.setLevel(logging.DEBUG)
 
 if app.debug or app.config.get('STAGING'):
     # Enable CORS

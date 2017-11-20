@@ -6,7 +6,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
 from werkzeug.utils import secure_filename
 
-from .. import app, db
+from .. import app, appLog, db
 from ..utils import allowed_file, authenticate, is_admin
 from .models import Corpus_category, Corpus_text
 
@@ -21,8 +21,30 @@ def get_corpus_categories():
     for category in categories:
         category_object = {'id': category.id, 'label': category.label}
         categories_list.append(category_object)
-    response_object = {'status': 'success', 'data': {'text': categories_list}}
+    response_object = {'status': 'success',
+                       'data': {'categories': categories_list}}
     return jsonify(response_object), 200
+
+
+@corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
+def get_corpus_category(cat_id):
+    """Get one corpus category"""
+    response_object = {'status': 'fail', 'message': 'Category does not exist'}
+    try:
+        category = Corpus_category.query.filter_by(id=cat_id).first()
+        if not category:
+            return jsonify(response_object), 404
+        else:
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'label': category.label
+                }
+            }
+            return jsonify(response_object), 200
+    except ValueError as e:
+        appLog.error(e)
+        return jsonify(response_object), 404
 
 
 @corpus_blueprint.route('/categories', methods=['POST'])
@@ -50,33 +72,14 @@ def add_corpus_category(user_id):
         else:
             response_object = {
                 'status': 'fail',
-                'message': 'Sorry. That category already exists.'
+                'message': f'Sorry. The category "{label}" already exists.'
             }
             return jsonify(response_object), 400
     except exc.IntegrityError as e:
         db.session.rollback()
+        appLog.error(e)
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
-
-
-@corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
-def get_corpus_category(cat_id):
-    """Get one corpus categories"""
-    response_object = {'status': 'fail', 'message': 'Category does not exist'}
-    try:
-        category = Corpus_category.query.filter_by(id=cat_id).first()
-        if not category:
-            return jsonify(response_object), 404
-        else:
-            response_object = {
-                'status': 'success',
-                'data': {
-                    'label': category.label
-                }
-            }
-            return jsonify(response_object), 200
-    except ValueError:
-        return jsonify(response_object), 404
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['DELETE'])
@@ -112,7 +115,8 @@ def delete_corpus_category(user_id, cat_id):
         }
         return jsonify(response_object), 200
     except (exc.IntegrityError, ValueError, TypeError, OSError) as e:
-        db.session().rollback()
+        db.session.rollback()
+        appLog.error(e)
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
@@ -152,6 +156,7 @@ def update_corpus_category(user_id, cat_id):
         return jsonify(response_object), 200
     except (exc.IntegrityError, ValueError, TypeError) as e:
         db.session().rollback()
+        appLog.error(e)
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
 
@@ -238,6 +243,7 @@ def add_corpus_text(user_id):
             return jsonify(response_object), code
     except exc.IntegrityError as e:
         db.session.rollback()
+        appLog.error(e)
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), code
 
@@ -278,5 +284,6 @@ def delete_corpus_text(user_id, text_id):
         return jsonify(response_object), 200
     except (exc.IntegrityError, ValueError, TypeError, OSError) as e:
         db.session().rollback()
+        appLog.error(e)
         response_object = {'status': 'fail', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400

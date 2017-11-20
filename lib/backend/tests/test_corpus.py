@@ -34,6 +34,41 @@ class TestCorpusService(BaseTestCase):
             self.assertIn('"romans" was added!', data['message'])
             self.assertIn('success', data['status'])
 
+    def test_add_duplicate_category(self):
+        """=> Ensure error is thrown if a category is a duplicate (label)."""
+        add_user('test', 'test@test.com', 'test')
+        with self.client:
+            resp_login = self.client.post(
+                '/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/categories',
+                data=json.dumps(dict(label='romans')),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            response = self.client.post(
+                '/categories',
+                data=json.dumps(dict(label='romans')),
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('fail', data['status'])
+            self.assertIn('Sorry. The category "romans" already exists.',
+                          data['message'])
+
+
     def test_add_category_no_label(self):
         """=> Ensure error is thrown if a label is not provided."""
         add_user('test', 'test@test.com', 'test')
