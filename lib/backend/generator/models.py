@@ -10,6 +10,7 @@ from .custom.markovChain import MarkovChain
 class TrainException(Exception):
     def __init__(self, value):
         self.parameter = value
+
     def __str__(self):
         return repr(self.parameter)
 
@@ -44,7 +45,7 @@ class MarkovifyAlgo(TextGenerationStragegy):
     def train(self, category_id):
         category = Corpus_category.query.filter_by(id=category_id).first()
         if not category:
-            raise TrainException("No text for this category")
+            raise TrainException("No text for this category.")
 
         corpus_texts = category.retrieve_corpus_text()
         text = ""
@@ -106,18 +107,22 @@ class MarkovChainAlgo(TextGenerationStragegy):
                                                         max_len=50,
                                                         verbose=True)])
 
-    def generateText(self, category_id):
+    def train(self, category_id):
         mkv = MarkovChain()
 
         try:
             corpus_texts = os.path.join(app.config['UPLOAD_FOLDER'],
                                         str(category_id))
 
-            mkv.bulk_train(corpus_texts + "/*.*", verbose=True)
+            parsed_files = mkv.bulk_train(corpus_texts + "/*.*")
+
+            if parsed_files == 0:
+                raise TrainException("No text for this category.")
 
             model_file = os.path.join(app.config['TRAINING_FOLDER'],
                                       "MarkovChain",
-                                      "MarkovChain_cat-{}".format(category_id)
+                                      "MarkovChain_cat-{}.model"
+                                      .format(category_id)
                                       )
             mkv.save_training(model_file)
             return True
@@ -125,13 +130,14 @@ class MarkovChainAlgo(TextGenerationStragegy):
             appLog.error(e)
             return False
 
-    def execute(self, category_id):
+    def generateText(self, category_id):
         mkv = MarkovChain()
 
         try:
             model_file = os.path.join(app.config['TRAINING_FOLDER'],
                                       "MarkovChain",
-                                      "MarkovChain_cat-{}".format(category_id)
+                                      "MarkovChain_cat-{}.model"
+                                      .format(category_id)
                                       )
             mkv.load_training(model_file)
 

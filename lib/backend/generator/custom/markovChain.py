@@ -3,6 +3,8 @@ import pickle  # Used for (de)serialization of the tree
 import random
 import re
 
+from ... import appLog
+
 
 class MarkovChain:
     """
@@ -48,17 +50,14 @@ class MarkovChain:
                 with open(filename, 'r', encoding=encoding) as f:
                     self.train(f.read())
                 if verbose:
-                    print('Successfully trained on "{0}". '
-                          '[ENCODING: {1}]'.format(filename, encoding))
+                    appLog.info('Successfully trained on "{0}". '
+                                '[ENCODING: {1}]'.format(filename, encoding))
                 ret = True
                 break
             except UnicodeDecodeError:
                 if verbose:
-                    print('Unable to decode "{0}" for training. '
-                          '[ENCODING: {1}]'.format(filename, encoding))
-
-        if verbose:
-            print()
+                    appLog.error('Unable to decode "{0}" for training. '
+                                 '[ENCODING: {1}]'.format(filename, encoding))
 
         return ret
 
@@ -73,10 +72,10 @@ class MarkovChain:
             if self.train_on_file(filename, verbose=verbose):
                 i += 1
             elif verbose:
-                print('Unable to train on "{0}".'.format(filename))
+                appLog.error('Unable to train on "{0}".'.format(filename))
 
         if verbose:
-            print('Successfully trained on {0} files.'.format(i))
+            appLog.info('Successfully trained on {0} files.'.format(i))
 
         return i
 
@@ -110,10 +109,10 @@ class MarkovChain:
             else random.choice([key for key in self.tree])
 
         if verbose:
-            print('Generating a sentence of {0}, starting with "{1}":\n'
-                  .format('max. {0} words'.format(max_len)
-                          if max_len > 0
-                          else 'unspecified length', word))
+            appLog.info('Generating a sentence of {0}, starting with "{1}":\n'
+                        .format('max. {0} words'.format(max_len)
+                                if max_len > 0
+                                else 'unspecified length', word))
 
         # Yield the starting word
         yield word
