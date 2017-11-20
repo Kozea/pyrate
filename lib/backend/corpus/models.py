@@ -24,6 +24,11 @@ class Corpus_category(db.Model):
         self.owner_id = owner_id
         self.private = private
 
+    def retrieve_corpus_text(self):
+        texts = Corpus_text.query.filter_by(category_id=self.id).all()
+        texts_list = [text.filename for text in texts]
+        return texts_list
+
 
 class Corpus_text(db.Model):
     __tablename__ = "corpus_texts"

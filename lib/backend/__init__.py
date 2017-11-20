@@ -29,10 +29,12 @@ migrate.init_app(app, db)
 from .corpus.corpus import corpus_blueprint  # noqa: E402
 from .users.auth import auth_blueprint  # noqa: E402
 from .users.users import users_blueprint  # noqa: E402
+from .generator.generator import generator_blueprint  # noqa: E402
 
 app.register_blueprint(users_blueprint)
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(corpus_blueprint)
+app.register_blueprint(generator_blueprint)
 
 if app.debug:
     logging.getLogger('sqlalchemy').setLevel(logging.INFO)

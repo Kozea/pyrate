@@ -17,6 +17,8 @@ lib/backend/application-custom.cfg
 lib/backend/database/pyrate*.db
 lib/backend/uploads/*/*.txt
 lib/backend/uploads/*/*.pdf
+lib/backend/tests/trainings/markovify/*.json
+lib/backend/tests/uploads/
 lib/frontend/assets/
 lib/frontend/static/
 

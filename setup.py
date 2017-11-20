@@ -42,6 +42,7 @@ setup(
         'itsdangerous == 0.24',
         'Jinja2 == 2.10',
         'Mako == 1.0.7',
+        'markovify == 0.6.4'
         'MarkupSafe == 1.0',
         'pycparser == 2.18',
         'PyJWT == 1.5.3',

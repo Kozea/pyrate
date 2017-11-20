@@ -11,6 +11,9 @@ class BaseConfig:
     BCRYPT_LOG_ROUNDS = 13
     TOKEN_EXPIRATION_DAYS = 30
     TOKEN_EXPIRATION_SECONDS = 0
+    TRAINING_FOLDER = os.path.join(
+        current_app.root_path, 'trainings'
+    )
     UPLOAD_FOLDER = os.path.join(
         current_app.root_path, 'uploads'
     )
@@ -41,3 +44,9 @@ class TestingConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 4
     TOKEN_EXPIRATION_DAYS = 0
     TOKEN_EXPIRATION_SECONDS = 3
+    TRAINING_FOLDER = os.path.join(
+        current_app.root_path, 'tests/trainings'
+    )
+    UPLOAD_FOLDER = os.path.join(
+        current_app.root_path, 'tests/uploads'
+    )
