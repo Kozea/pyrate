@@ -65,9 +65,9 @@ class TestCorpusService(BaseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertIn('fail', data['status'])
-            self.assertIn('Sorry. The category "romans" already exists.',
-                          data['message'])
-
+            self.assertIn(
+                'Sorry. The category "romans" already exists.', data['message']
+            )
 
     def test_add_category_no_label(self):
         """=> Ensure error is thrown if a label is not provided."""
@@ -129,8 +129,9 @@ class TestCorpusService(BaseTestCase):
             )
             response = self.client.delete(
                 f'/categories/{cat.id}',
-                headers=dict(Authorization='Bearer ' +
-                             json.loads(resp_login.data.decode())['auth_token']
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -151,14 +152,17 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                data=json.dumps(
+                    dict(email='admin@admin.com', password='admin')
+                ),
                 content_type='application/json'
             )
 
             response = self.client.delete(
                 f'/categories/{cat.id}',
-                headers=dict(Authorization='Bearer ' +
-                     json.loads(resp_login.data.decode())['auth_token']
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -177,23 +181,27 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='another@another.com',
-                                     password='another')),
+                data=json.dumps(
+                    dict(email='another@another.com', password='another')
+                ),
                 content_type='application/json'
             )
 
             response = self.client.delete(
                 f'/categories/{cat.id}',
-                headers=dict(Authorization='Bearer ' +
-                     json.loads(resp_login.data.decode())['auth_token']
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 401)
             self.assertIn('error', data['status'])
-            self.assertIn('You do not have permission to delete this category.',
-                          data['message'])
+            self.assertIn(
+                'You do not have permission to delete this category.',
+                data['message']
+            )
 
     def test_delete_not_exiting_category(self):
         """=> Ensure error is thrown if a category does not exist"""
@@ -207,8 +215,9 @@ class TestCorpusService(BaseTestCase):
             )
             response = self.client.delete(
                 '/categories/999999999',
-                headers=dict(Authorization='Bearer ' +
-                             json.loads(resp_login.data.decode())['auth_token']
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -244,7 +253,6 @@ class TestCorpusService(BaseTestCase):
             self.assertIn('Category was updated!', data['message'])
             self.assertIn('success', data['status'])
 
-
     def test_update_category_admin(self):
         """=> Ensure an existing category can be updated in the database."""
         user = add_user('test', 'test@test.com', 'test')
@@ -257,7 +265,9 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                data=json.dumps(
+                    dict(email='admin@admin.com', password='admin')
+                ),
                 content_type='application/json'
             )
             response = self.client.put(
@@ -284,8 +294,9 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='another@another.com',
-                                     password='another')),
+                data=json.dumps(
+                    dict(email='another@another.com', password='another')
+                ),
                 content_type='application/json'
             )
             response = self.client.put(
@@ -299,8 +310,10 @@ class TestCorpusService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 401)
-            self.assertIn('You do not have permission to update this category.',
-                          data['message'])
+            self.assertIn(
+                'You do not have permission to update this category.',
+                data['message']
+            )
             self.assertIn('error', data['status'])
 
     def test_update_category_invalid_json(self):
@@ -348,9 +361,7 @@ class TestCorpusService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 400)
-            self.assertIn(
-                'Category 1 does not exist.', data['message']
-            )
+            self.assertIn('Category 1 does not exist.', data['message'])
             self.assertIn('error', data['status'])
 
     def test_add_text_in_corpus(self):
@@ -423,7 +434,8 @@ class TestCorpusService(BaseTestCase):
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
             self.assertTrue(
-                data['message'] == f'Sorry. A text with the same title already exists.'
+                data['message'] ==
+                f'Sorry. A text with the same title already exists.'
             )
             self.assertEqual(response.status_code, 400)
 
@@ -454,9 +466,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'File extension not allowed.'
-            )
+            self.assertTrue(data['message'] == f'File extension not allowed.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_empty_file(self):
@@ -486,9 +496,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'No selected file.'
-            )
+            self.assertTrue(data['message'] == f'No selected file.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_no_file(self):
@@ -518,9 +526,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'No file part.'
-            )
+            self.assertTrue(data['message'] == f'No file part.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_no_file2(self):
@@ -549,9 +555,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'No file part.'
-            )
+            self.assertTrue(data['message'] == f'No file part.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_no_data(self):
@@ -580,9 +584,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'Invalid payload.'
-            )
+            self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_no_form(self):
@@ -608,9 +610,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'Invalid payload.'
-            )
+            self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_without_title(self):
@@ -639,9 +639,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'Invalid payload.'
-            )
+            self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
     def test_add_text_in_corpus_without_category(self):
@@ -670,9 +668,7 @@ class TestCorpusService(BaseTestCase):
 
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(
-                data['message'] == f'Invalid payload.'
-            )
+            self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
     def test_delete_corpus(self):
@@ -723,7 +719,9 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='admin@admin.com', password='admin')),
+                data=json.dumps(
+                    dict(email='admin@admin.com', password='admin')
+                ),
                 content_type='application/json'
             )
             response = self.client.post(
@@ -761,8 +759,9 @@ class TestCorpusService(BaseTestCase):
         with self.client:
             resp_login = self.client.post(
                 '/auth/login',
-                data=json.dumps(dict(email='another@another.com',
-                                     password='another')),
+                data=json.dumps(
+                    dict(email='another@another.com', password='another')
+                ),
                 content_type='application/json'
             )
             response = self.client.post(
@@ -788,8 +787,10 @@ class TestCorpusService(BaseTestCase):
 
             self.assertEqual(response.status_code, 401)
             self.assertIn('error', data['status'])
-            self.assertIn('You do not have permission to delete this text.',
-                          data['message'])
+            self.assertIn(
+                'You do not have permission to delete this text.',
+                data['message']
+            )
 
     def test_delete_not_exiting_corpus(self):
         """=> Ensure error is thrown if a text does not exist"""

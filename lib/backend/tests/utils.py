@@ -11,9 +11,7 @@ def add_user(username, email, password):
 
 
 def add_category(label, owner_id, private=False):
-    cat = Corpus_category(label=label,
-                          owner_id=owner_id,
-                          private=private)
+    cat = Corpus_category(label=label, owner_id=owner_id, private=private)
     db.session.add(cat)
     db.session.commit()
     return cat

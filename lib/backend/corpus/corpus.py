@@ -21,8 +21,12 @@ def get_corpus_categories():
     for category in categories:
         category_object = {'id': category.id, 'label': category.label}
         categories_list.append(category_object)
-    response_object = {'status': 'success',
-                       'data': {'categories': categories_list}}
+    response_object = {
+        'status': 'success',
+        'data': {
+            'categories': categories_list
+        }
+    }
     return jsonify(response_object), 200
 
 
@@ -60,9 +64,11 @@ def add_corpus_category(user_id):
     try:
         category = Corpus_category.query.filter_by(label=label).first()
         if not category:
-            db.session.add(Corpus_category(label=label,
-                                           private=private,
-                                           owner_id=user_id))
+            db.session.add(
+                Corpus_category(
+                    label=label, private=private, owner_id=user_id
+                )
+            )
             db.session.commit()
             response_object = {
                 'status': 'success',
@@ -207,8 +213,10 @@ def add_corpus_text(user_id):
         response_object = {'status': 'fail', 'message': 'No selected file.'}
         return jsonify(response_object), code
     if not allowed_file(file.filename):
-        response_object = {'status': 'fail',
-                           'message': 'File extension not allowed.'}
+        response_object = {
+            'status': 'fail',
+            'message': 'File extension not allowed.'
+        }
         return jsonify(response_object), code
 
     filename = secure_filename(file.filename)

@@ -9,9 +9,7 @@ class Corpus_category(db.Model):
     label = db.Column(db.String(80), unique=True, nullable=False)
     private = db.Column(db.Boolean, default=False, nullable=False)
 
-    owner_id = db.Column(
-        db.Integer, db.ForeignKey('users.id'), nullable=False
-    )
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship(
         'User', backref=db.backref('corpus_categories', lazy=True)
     )
