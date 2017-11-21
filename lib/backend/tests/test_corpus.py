@@ -2,7 +2,7 @@ import json
 
 from base import BaseTestCase
 from io import BytesIO
-from utils import add_category, add_corpus_text, add_user
+from utils import add_category, add_user
 
 from lib.backend import db
 
