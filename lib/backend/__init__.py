@@ -30,6 +30,7 @@ from .corpus.corpus import corpus_blueprint  # noqa: E402
 from .users.auth import auth_blueprint  # noqa: E402
 from .users.users import users_blueprint  # noqa: E402
 from .generator.generator import generator_blueprint  # noqa: E402
+from .generator.models import Algorithm  # noqa: E402
 
 app.register_blueprint(users_blueprint)
 app.register_blueprint(auth_blueprint)
@@ -64,6 +65,18 @@ def recreate_db():
     db.create_all()
     db.session.commit()
     print('Database (re)creation done.')
+
+
+@app.cli.command()
+def seed_db():
+    """Seeds the database."""
+    db.session.add(Algorithm(
+        label='markovify'
+        ))
+    db.session.add(Algorithm(
+        label='MarkovChain'
+        ))
+    db.session.commit()
 
 
 @app.cli.command()

@@ -2,9 +2,22 @@ import os
 
 import markovify
 
-from .. import app, appLog
+from .. import app, appLog, db
 from ..corpus.models import Corpus_category
 from .custom.markovChain import MarkovChain
+
+
+class Algorithm(db.Model):
+    __tablename__ = "algorithms"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    label = db.Column(db.String(80), unique=True, nullable=False)
+    last_train_date = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return '<Text generation algorithm %r>' % self.label
+
+    def __init__(self, label):
+        self.label = label
 
 
 class TrainException(Exception):

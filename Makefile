@@ -113,5 +113,8 @@ test-python: lint-python check-python
 recreate_db:
 	$(FLASK) recreate_db
 
+seed_db:
+	$(FLASK) seed_db
+
 db:
 	$(FLASK) db ${COMMAND}
