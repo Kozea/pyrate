@@ -13,7 +13,7 @@ algos = {
 }
 
 
-def verify_paylaod(request):
+def verify_payload(request):
     response_object = {'status': 'fail', 'message': 'Invalid payload.'}
     post_data = request.get_json()
     if not post_data:
@@ -44,7 +44,7 @@ def verify_paylaod(request):
 @generator_blueprint.route('/train', methods=['POST'])
 def train():
     """Train the selected model"""
-    response_object, algo, category_id = verify_paylaod(request)
+    response_object, algo, category_id = verify_payload(request)
 
     # if response_object not None, an error was identified
     if response_object:
@@ -80,7 +80,7 @@ def train():
 @generator_blueprint.route('/generate', methods=['POST'])
 def generate_text():
     """Generate text"""
-    response_object, algo, category_id = verify_paylaod(request)
+    response_object, algo, category_id = verify_payload(request)
 
     # if response_object not None, an error was identified
     if response_object:
