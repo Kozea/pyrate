@@ -63,7 +63,8 @@ fix:
 		$(MAKE) P="fix-python fix-node" make-p
 
 check-python:
-	FLASK_CONFIG=$(FLASK_TEST_CONFIG) $(PYTEST) lib $(PYTEST_ARGS)
+	# FLASK_CONFIG=$(FLASK_TEST_CONFIG) $(PYTEST) lib $(PYTEST_ARGS)
+	$(FLASK) test
 
 check-node-debug:
 	$(NPM) run test-debug
@@ -107,8 +108,7 @@ run:
 serve: env-check clean
 	$(MAKE) P="serve-node-client serve-node-server serve-python" make-p
 
-test-python:
-	$(FLASK) test
+test-python: lint-python check-python
 
 recreate_db:
 	$(FLASK) recreate_db

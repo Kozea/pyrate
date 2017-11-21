@@ -1,4 +1,6 @@
-from lib.backend import db
+import os
+
+from lib.backend import app, db
 from lib.backend.corpus.models import Corpus_category, Corpus_text
 from lib.backend.users.models import User
 
@@ -27,3 +29,15 @@ def add_corpus_text(title, filename, category_id, author_id):
     db.session.add(text)
     db.session.commit()
     return text
+
+
+def add_all():
+    user = add_user('test', 'test@test.com', 'test')
+    cat = add_category('romans', user.id)
+    filename = 'les_miserables_markov.txt'
+    dirpath = os.path.join(app.root_path, 'tests/files')
+    filepath = os.path.join(dirpath, filename)
+    txt = add_corpus_text('les_miserables_markov',
+                          filepath,
+                          cat.id,
+                          user.id)
