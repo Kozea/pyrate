@@ -52,7 +52,7 @@ def train():
 
     try:
         text_generator = models.TextGeneration(getattr(models, algos[algo])())
-        result = text_generator.train(category_id)
+        trained = text_generator.train(category_id)
     except Exception as e:
         appLog.error(e)
         response_object = {
@@ -62,7 +62,7 @@ def train():
         }
         return jsonify(response_object), 500
 
-    if result == 0:
+    if not trained:
         response_object = {
             'status': 'fail',
             'message': 'Failed during model training. '
@@ -84,7 +84,7 @@ def generate_text():
 
     # if response_object not None, an error was identified
     if response_object:
-        return jsonify(response_object), 500
+        return jsonify(response_object), 400
 
     text_generator = models.TextGeneration(getattr(models, algos[algo])())
     result = text_generator.generateText(category_id)

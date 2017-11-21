@@ -33,6 +33,7 @@ setup(
         'bcrypt == 3.1.4',
         'cffi == 1.11.2',
         'click == 6.7',
+        'ddt == 1.1.1',
         'Flask == 0.12.2',
         'Flask-Bcrypt == 0.7.1',
         'Flask-Migrate == 2.1.1',
