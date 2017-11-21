@@ -38,6 +38,14 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
+                '/train',
+                data=json.dumps(dict(
+                    algo=value,
+                    category_id=1
+                    )),
+                content_type='application/json'
+            )
+            response = self.client.post(
                 '/generate',
                 data=json.dumps(dict(
                     algo=value,
@@ -185,6 +193,32 @@ class TestGeneratorService(BaseTestCase):
             if route == '/train':
                 self.assertIn('Failed during model training. Please verify corpus texts.',
                               data['message'])
-            else:
-                self.assertIn('No result, maybe the model is not trained.',
+            else:  # no train in this case (not a test on fil existence)
+                self.assertIn('No result, maybe the model must be re-trained.',
                               data['message'])
+
+    @data('markovify', 'MarkovChain')
+    def test_generate_text_no_file(self, value):
+        """
+            => Ensure error is thrown if there is no text in corpus or
+               pre-trained models.
+        """
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('test', user.id)
+        cat = add_category('romans', user.id)  # to be sure no file exist
+
+        with self.client:
+            response = self.client.post(
+                '/generate',
+                data=json.dumps(dict(
+                    algo=value,
+                    category_id=2
+                    )),
+                content_type='application/json'
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('fail', data['status'])
+            self.assertIn('No result, maybe the model must be re-trained.',
+                          data['message'])

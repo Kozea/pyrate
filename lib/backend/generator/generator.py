@@ -1,16 +1,12 @@
+import datetime
 from flask import Blueprint, jsonify, request
 
-from .. import appLog
+from .. import appLog, db
 from ..corpus.models import Corpus_category
 from ..generator import models
+from ..generator.models import Algorithm
 
 generator_blueprint = Blueprint('generator', __name__)
-
-
-algos = {
-    'markovify': 'MarkovifyAlgo',
-    'MarkovChain': 'MarkovChainAlgo'
-}
 
 
 def verify_payload(request):
@@ -18,13 +14,14 @@ def verify_payload(request):
     post_data = request.get_json()
     if not post_data:
         return response_object, None, None
-    algo = post_data.get('algo')
+    algo_name = post_data.get('algo')
     category_id = post_data.get('category_id')
 
-    if algo is None or category_id is None:
+    if algo_name is None or category_id is None:
         return response_object, None, None
 
-    if algo not in algos:
+    algo = Algorithm.query.filter_by(label=algo_name).first()
+    if not algo:
         response_object = {
             'status': 'error',
             'message': 'Selected algorithm does not exist.'
@@ -41,6 +38,32 @@ def verify_payload(request):
     return None, algo, category_id
 
 
+@generator_blueprint.route('/algorithmes', methods=['GET'])
+def get_algorithm():
+    """Get all corpus categories"""
+    algos = Algorithm.query.all()
+    algos_list = []
+    for algo in algos:
+        trainings_list = {}
+        for training in algo.trainings:
+            trainings_list = {
+                'category_id': training.category_id,
+                'last_train': training.last_train_date
+            }
+        algo_object = {
+            'label': algo.label,
+            'training': trainings_list
+        }
+        algos_list.append(algo_object)
+    response_object = {
+        'status': 'success',
+        'data': {
+            'algorithmes': algos_list
+        }
+    }
+    return jsonify(response_object), 200
+
+
 @generator_blueprint.route('/train', methods=['POST'])
 def train():
     """Train the selected model"""
@@ -50,8 +73,10 @@ def train():
     if response_object:
         return jsonify(response_object), 400
 
+    # The others letters must keep capital letters
+    algo_class = algo.label[0].capitalize() + algo.label[1:] + "Algo"
     try:
-        text_generator = models.TextGeneration(getattr(models, algos[algo])())
+        text_generator = models.TextGeneration(getattr(models, algo_class)())
         trained = text_generator.train(category_id)
     except Exception as e:
         appLog.error(e)
@@ -70,9 +95,12 @@ def train():
         }
         return jsonify(response_object), 400
 
+    #algo.last_train_date = datetime.datetime.utcnow()
+    #db.session.commit()
+
     response_object = {
         'status': 'success',
-        'message': f'Model "{algo}" trained. You can now generate texts.'
+        'message': f'Model "{algo.label}" trained. You can now generate texts.'
     }
     return jsonify(response_object), 200
 
@@ -86,13 +114,22 @@ def generate_text():
     if response_object:
         return jsonify(response_object), 400
 
-    text_generator = models.TextGeneration(getattr(models, algos[algo])())
+    if not algo.is_trained(category_id):
+        response_object = {
+            'status': 'fail',
+            'message': 'The model is not trained. Please train it and retry.'
+        }
+        return jsonify(response_object), 400
+
+    # The others letters must keep capital letters
+    algo_class = algo.label[0].capitalize() + algo.label[1:] + "Algo"
+    text_generator = models.TextGeneration(getattr(models, algo_class)())
     result = text_generator.generateText(category_id)
 
     if not result:
         response_object = {
             'status': 'fail',
-            'message': 'No result, maybe the model is not trained.'
+            'message': 'No result, maybe the model must be re-trained.'
         }
         return jsonify(response_object), 400
 

@@ -1,7 +1,7 @@
 from flask_testing import TestCase
 
 from lib.backend import app, db
-
+from lib.backend.generator.models import Algorithm
 
 class BaseTestCase(TestCase):
     def create_app(self):
@@ -10,6 +10,12 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
+        db.session.add(Algorithm(
+            label='markovify'
+        ))
+        db.session.add(Algorithm(
+            label='MarkovChain'
+        ))
         db.session.commit()
 
     def tearDown(self):
