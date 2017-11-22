@@ -78,7 +78,26 @@ def train():
     algo_class = algo.label[0].capitalize() + algo.label[1:] + "Algo"
     try:
         text_generator = models.TextGeneration(getattr(models, algo_class)())
-        trained = text_generator.train(category_id)
+        trained_OK = text_generator.train(category_id)
+
+        if not trained_OK:
+            response_object = {
+                'status': 'fail',
+                'message': 'Failed during model training. '
+                'Please verify corpus texts.'
+            }
+            return jsonify(response_object), 400
+
+        # update date of the last training with the selected category
+        training = Training.query.filter_by(algorithm_id=algo.id,
+                                            category_id=category_id).first()
+        if not training:
+            training = Training()
+            training.category_id = category_id
+            # training.last_train_date = datetime.datetime.utcnow()
+            algo.trainings.append(training)
+        training.last_train_date = datetime.datetime.utcnow()
+        db.session.commit()
     except Exception as e:
         appLog.error(e)
         response_object = {
@@ -87,21 +106,6 @@ def train():
             'Please verify corpus texts.'
         }
         return jsonify(response_object), 500
-
-    if not trained:
-        response_object = {
-            'status': 'fail',
-            'message': 'Failed during model training. '
-            'Please verify corpus texts.'
-        }
-        return jsonify(response_object), 400
-
-    # update date of the last training with the selected category
-    training = Training()
-    training.category_id = category_id
-    training.last_train_date = datetime.datetime.utcnow()
-    algo.trainings.append(training)
-    db.session.commit()
 
     response_object = {
         'status': 'success',
