@@ -1,8 +1,10 @@
 import React from 'react'
 
-export const NavBar = () => (
+const NavBar = () => (
   <div>
     <h1>PyRaTe</h1>
     login register
   </div>
 )
+
+export default NavBar
