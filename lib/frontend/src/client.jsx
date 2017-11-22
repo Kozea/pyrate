@@ -1,16 +1,37 @@
 import React from 'react'
 import { hydrate, render } from 'react-dom'
+import { Provider } from 'react-redux'
 import RedBox from 'redbox-react'
+import { createStore, combineReducers } from 'redux'
+import { reducer as formReducer } from 'redux-form'
 
 import App from './components/App'
+import reducer from './components/reducer'
 import { debug } from './config'
+
+// On definit les reducers qui vont se charger de modifier l'état
+const reducers = {
+  // reducer est le reducer que l'on a définit pour la gestion des categories
+  reducer,
+  // provient de Redux-Form une lib spécialisée ds le traitement de formulaires
+  form: formReducer,
+}
+// +sieurs reducers donc on "combine"
+const reduc = combineReducers(reducers)
+// store var conserver l'etat des objets ds l'app
+export const store = createStore(reduc)
 
 export const rootNode = document.getElementById('root')
 
 export const renderRoot = handleError => {
   try {
     const renderMode = debug ? render : hydrate
-    renderMode(<App />, rootNode)
+    renderMode(
+      <Provider store={store}>
+        <App />
+      </Provider>,
+      rootNode
+    )
   } catch (error) {
     handleError(error)
   }

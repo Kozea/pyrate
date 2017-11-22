@@ -1,12 +1,9 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-import NavBar from './NavBar'
-import Content from './Content'
-import Login from './User/login'
-import Register from './User/register'
-import Categories from './Corpus/categories'
-import Corpus from './Corpus/corpustexts'
-import Texts from './Corpus/texts'
+import { menu } from './actions'
+import NavBar from './Navbar'
+
 import '../style.css'
 
 class App extends React.Component {
@@ -16,32 +13,28 @@ class App extends React.Component {
       showReply: false,
     }
   }
-
-  renderRoute() {
-    switch (window.location.pathname) {
-      case '/':
-        return <Content />
-      case '/login':
-        return <Login />
-      case '/register':
-        return <Register />
-      case '/categories':
-        return <Categories />
-      case '/corpustexts':
-        return <Corpus />
-      case '/texts':
-        return <Texts />
-    }
-  }
-
   render() {
     return (
       <div className="app">
         <NavBar />
-        {this.renderRoute()}
+        <div
+          value={menu}
+          onChange={e => onClickComp()}>
       </div>
     )
   }
 }
+{/* // container: on lie le comp parent à redux.
+// mapStateToProps prend l'etat et le transmet à la liste des categories ss
+// forme de proprietes.
+// mapDispatchToProps est la fct chargé de faire le lien entre les proprietes
+// aux fonctions issues de actions.js */}
 
-export default App
+export default connect(
+  state => ({ menu: state.menu }),
+  dispatch => ({
+    onClickComp: value => {
+      dispatch(menu(value))
+    },
+  })
+)(App)
