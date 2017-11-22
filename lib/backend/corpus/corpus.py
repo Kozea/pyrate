@@ -7,10 +7,20 @@ from sqlalchemy import exc
 from werkzeug.utils import secure_filename
 
 from .. import app, appLog, db
+from ..generator.models import Training
 from ..utils import allowed_file, authenticate, is_admin
 from .models import Corpus_category, Corpus_text
 
 corpus_blueprint = Blueprint('corpus', __name__)
+
+
+def update_trainings(category_id):
+    # TODO: CHECK SQL ALCHEMY
+    """ Empty last training date when the corpus is modified """
+    trainings = Training.query.filter_by(category_id=category_id)
+    for training in trainings:
+        training.last_train_date = None
+    # db.session.commit() is the calling function
 
 
 @corpus_blueprint.route('/categories', methods=['GET'])
@@ -108,6 +118,7 @@ def delete_corpus_category(user_id, cat_id):
         return jsonify(response_object), 401
 
     try:
+        Training.query.filter_by(category_id=cat_id).delete()
         Corpus_text.query.filter_by(category_id=cat_id).delete()
         Corpus_category.query.filter_by(id=cat_id).delete()
         db.session.commit()
@@ -237,6 +248,7 @@ def add_corpus_text(user_id):
                     author_id=user_id
                 )
             )
+            update_trainings(category_id)
             db.session.commit()
             response_object = {
                 'status': 'success',
@@ -280,6 +292,7 @@ def delete_corpus_text(user_id, text_id):
     filepath = text.filename
 
     try:
+        update_trainings(text.category_id)
         Corpus_text.query.filter_by(id=text_id).delete()
         db.session.commit()
 

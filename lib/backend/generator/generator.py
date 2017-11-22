@@ -1,10 +1,11 @@
 import datetime
+
 from flask import Blueprint, jsonify, request
 
 from .. import appLog, db
 from ..corpus.models import Corpus_category
 from ..generator import models
-from ..generator.models import Algorithm
+from ..generator.models import Algorithm, Training
 
 generator_blueprint = Blueprint('generator', __name__)
 
@@ -44,7 +45,7 @@ def get_algorithm():
     algos = Algorithm.query.all()
     algos_list = []
     for algo in algos:
-        trainings_list = {}
+        trainings_list = None
         for training in algo.trainings:
             trainings_list = {
                 'category_id': training.category_id,
@@ -95,8 +96,12 @@ def train():
         }
         return jsonify(response_object), 400
 
-    #algo.last_train_date = datetime.datetime.utcnow()
-    #db.session.commit()
+    # update date of the last training with the selected category
+    training = Training()
+    training.category_id = category_id
+    training.last_train_date = datetime.datetime.utcnow()
+    algo.trainings.append(training)
+    db.session.commit()
 
     response_object = {
         'status': 'success',

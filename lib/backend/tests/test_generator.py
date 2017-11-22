@@ -1,10 +1,12 @@
+import datetime
 import json
 from ddt import ddt, data, unpack
 
 from base import BaseTestCase
 from utils import add_all, add_category, add_user
 
-from lib.backend.generator.models import TextGeneration, MarkovifyAlgo, MarkovChainAlgo
+from lib.backend import db
+from lib.backend.generator.models import TextGeneration, MarkovifyAlgo, MarkovChainAlgo, Training, Algorithm
 
 
 @ddt
@@ -162,25 +164,21 @@ class TestGeneratorService(BaseTestCase):
             self.assertIn('error', data['status'])
             self.assertIn('Selected category does not exist.', data['message'])
 
-    @data(('markovify', '/train'),
-          ('markovify', '/generate'),
-          ('MarkovChain', '/train'),
-          ('MarkovChain', '/generate'))
-    @unpack
-    def test_generator_no_file(self, algo, route):
+    @data('markovify', 'MarkovChain')
+    def test_train_no_file(self, value):
         """
             => Ensure error is thrown if there is no text in corpus or
                pre-trained models.
         """
         user = add_user('test', 'test@test.com', 'test')
         cat = add_category('test', user.id)
-        cat = add_category('romans', user.id)  # to be sure no file exist
+        cat = add_category('romans', user.id)  # to be sure no file exists
 
         with self.client:
             response = self.client.post(
-                route,
+                '/train',
                 data=json.dumps(dict(
-                    algo=algo,
+                    algo=value,
                     category_id=2
                     )),
                 content_type='application/json'
@@ -189,23 +187,49 @@ class TestGeneratorService(BaseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertIn('fail', data['status'])
-
-            if route == '/train':
-                self.assertIn('Failed during model training. Please verify corpus texts.',
-                              data['message'])
-            else:  # no train in this case (not a test on fil existence)
-                self.assertIn('No result, maybe the model must be re-trained.',
-                              data['message'])
+            self.assertIn('Failed during model training. Please verify corpus texts.',
+                          data['message'])
 
     @data('markovify', 'MarkovChain')
-    def test_generate_text_no_file(self, value):
+    def test_generate_no_train(self, value):
         """
-            => Ensure error is thrown if there is no text in corpus or
-               pre-trained models.
+            => Ensure error is thrown if the model is not trained.
         """
         user = add_user('test', 'test@test.com', 'test')
         cat = add_category('test', user.id)
-        cat = add_category('romans', user.id)  # to be sure no file exist
+        cat = add_category('romans', user.id)  # to be sure no file exists
+
+        with self.client:
+            response = self.client.post(
+                '/generate',
+                data=json.dumps(dict(
+                    algo=value,
+                    category_id=2
+                    )),
+                content_type='application/json'
+            )
+            data = json.loads(response.data.decode())
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('fail', data['status'])
+            self.assertIn('The model is not trained. Please train it and retry.',
+                          data['message'])
+
+    @data('markovify', 'MarkovChain')
+    def test_generate_no_file(self, value):
+        """
+            => Ensure error is thrown if there is no pre-trained models.
+        """
+        user = add_user('test', 'test@test.com', 'test')
+        cat = add_category('test', user.id)
+        cat = add_category('romans', user.id)  # to be sure no file exists
+
+        algo = Algorithm.query.filter_by(label=value).first()
+        training = Training()
+        training.category_id = cat.id
+        training.last_train_date = datetime.datetime.utcnow()
+        algo.trainings.append(training)
+        db.session.commit()
 
         with self.client:
             response = self.client.post(
