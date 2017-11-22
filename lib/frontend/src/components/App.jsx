@@ -1,6 +1,6 @@
 import React from 'react'
 
-import NavBar from './NavBar'
+import NavBar from './Navbar'
 import Content from './Content'
 import Login from './User/login'
 import Register from './User/register'
