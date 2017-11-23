@@ -20,7 +20,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/train',
+                '/api/train',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=1
@@ -40,7 +40,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/train',
+                '/api/train',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=1
@@ -48,7 +48,7 @@ class TestGeneratorService(BaseTestCase):
                 content_type='application/json'
             )
             response = self.client.post(
-                '/generate',
+                '/api/generate',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=1
@@ -68,7 +68,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                value,
+                '/api' + value,
                 data=json.dumps(dict()),
                 content_type='application/json'
             )
@@ -89,7 +89,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                route,
+                '/api' + route,
                 data=json.dumps(dict(
                     algo=algo
                     )),
@@ -108,7 +108,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                value,
+                '/api' + value,
                 data=json.dumps(dict(
                     category_id=1
                     )),
@@ -127,7 +127,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                value,
+                '/api' + value,
                 data=json.dumps(dict(
                     algo='no-model',
                     category_id=1
@@ -151,7 +151,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                route,
+                '/api' + route,
                 data=json.dumps(dict(
                     algo=algo,
                     category_id=99999999
@@ -176,7 +176,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/train',
+                '/api/train',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=2
@@ -201,7 +201,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/generate',
+                '/api/generate',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=2
@@ -233,7 +233,7 @@ class TestGeneratorService(BaseTestCase):
 
         with self.client:
             response = self.client.post(
-                '/generate',
+                '/api/generate',
                 data=json.dumps(dict(
                     algo=value,
                     category_id=2
