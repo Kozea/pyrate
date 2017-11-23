@@ -7,6 +7,7 @@ import DisplayCatList from '../containers/DisplayCategories'
 import DisplayTextsList from '../containers/DisplayTexts'
 import DisplayCorpusList from '../containers/DisplayCorpus'
 import TextGenerator from '../containers/DisplayTextGenerator'
+import DisplayAlgoList from '../containers/DisplayAlgorithmes'
 
 export default function App() {
   return (
@@ -15,8 +16,10 @@ export default function App() {
       <hr />
       <TextGenerator />
       <hr />
-      <AddCategory />
+      <hr />
+      <DisplayAlgoList />
       <DisplayCatList />
+      <AddCategory />
       <hr />
       <DisplayTextsList />
 
