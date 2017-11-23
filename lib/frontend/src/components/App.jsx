@@ -6,14 +6,14 @@ import AddCorpus from '../containers/AddCorpus'
 import DisplayCatList from '../containers/DisplayCategories'
 import DisplayTextsList from '../containers/DisplayTexts'
 import DisplayCorpusList from '../containers/DisplayCorpus'
-import AlgorithmesList from '../containers/DisplayAlgorithmes'
+import TextGenerator from '../containers/DisplayTextGenerator'
 
 export default function App() {
   return (
     <div>
       <NavBar />
       <hr />
-      <AlgorithmesList />
+      <TextGenerator />
       <hr />
       <AddCategory />
       <DisplayCatList />
