@@ -52,6 +52,7 @@ def get_algorithm():
                 'last_train': training.last_train_date
             }
         algo_object = {
+            'id': algo.id,
             'label': algo.label,
             'training': trainings_list
         }
