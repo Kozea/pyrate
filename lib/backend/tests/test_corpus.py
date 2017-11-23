@@ -15,12 +15,12 @@ class TestCorpusService(BaseTestCase):
         add_user('test', 'test@test.com', 'test')
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/categories',
+                '/api/categories',
                 data=json.dumps(dict(label='romans')),
                 content_type='application/json',
                 headers=dict(
@@ -39,12 +39,12 @@ class TestCorpusService(BaseTestCase):
         add_user('test', 'test@test.com', 'test')
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/categories',
+                '/api/categories',
                 data=json.dumps(dict(label='romans')),
                 content_type='application/json',
                 headers=dict(
@@ -53,7 +53,7 @@ class TestCorpusService(BaseTestCase):
                 )
             )
             response = self.client.post(
-                '/categories',
+                '/api/categories',
                 data=json.dumps(dict(label='romans')),
                 content_type='application/json',
                 headers=dict(
@@ -74,12 +74,12 @@ class TestCorpusService(BaseTestCase):
         add_user('test', 'test@test.com', 'test')
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/categories',
+                '/api/categories',
                 data=json.dumps(dict()),
                 content_type='application/json',
                 headers=dict(
@@ -99,7 +99,7 @@ class TestCorpusService(BaseTestCase):
         cat = add_category('romans', user.id)
 
         with self.client:
-            response = self.client.get(f'/categories/{cat.id}')
+            response = self.client.get(f'/api/categories/{cat.id}')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 200)
@@ -109,7 +109,7 @@ class TestCorpusService(BaseTestCase):
     def test_get_no_existing_category(self):
         """=> Ensure error is thrown if a category does not exist"""
         with self.client:
-            response = self.client.get(f'/categories/99999999')
+            response = self.client.get(f'/api/categories/99999999')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 404)
@@ -123,12 +123,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.delete(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -151,7 +151,7 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='admin@admin.com', password='admin')
                 ),
@@ -159,7 +159,7 @@ class TestCorpusService(BaseTestCase):
             )
 
             response = self.client.delete(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -180,7 +180,7 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='another@another.com', password='another')
                 ),
@@ -188,7 +188,7 @@ class TestCorpusService(BaseTestCase):
             )
 
             response = self.client.delete(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -209,12 +209,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.delete(
-                '/categories/999999999',
+                '/api/categories/999999999',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -235,12 +235,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.put(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 data=json.dumps(dict(label='newspapers')),
                 content_type='application/json',
                 headers=dict(
@@ -264,14 +264,14 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='admin@admin.com', password='admin')
                 ),
                 content_type='application/json'
             )
             response = self.client.put(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 data=json.dumps(dict(label='newspapers')),
                 content_type='application/json',
                 headers=dict(
@@ -293,14 +293,14 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='another@another.com', password='another')
                 ),
                 content_type='application/json'
             )
             response = self.client.put(
-                f'/categories/{cat.id}',
+                f'/api/categories/{cat.id}',
                 data=json.dumps(dict(label='newspapers')),
                 content_type='application/json',
                 headers=dict(
@@ -322,12 +322,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.put(
-                '/categories/1',
+                '/api/categories/1',
                 data=json.dumps(dict()),
                 content_type='application/json',
                 headers=dict(
@@ -346,12 +346,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.put(
-                '/categories/1',
+                '/api/categories/1',
                 data=json.dumps(dict(label='newspapers')),
                 content_type='application/json',
                 headers=dict(
@@ -371,12 +371,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -401,12 +401,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -419,7 +419,7 @@ class TestCorpusService(BaseTestCase):
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -446,13 +446,13 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.aaaa'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -476,13 +476,13 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(), ""),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -506,13 +506,13 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file="",
                     data='{"title": "les miserables", "category_id": 1}'
@@ -536,13 +536,13 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     data='{"title": "les miserables", "category_id": 1}'
                 ),
@@ -565,13 +565,13 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
 
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt')
                 ),
@@ -594,12 +594,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(),
                 headers=dict(
                     content_type='multipart/form-data',
@@ -620,12 +620,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"category_id": 1}'
@@ -649,12 +649,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "Les miserables"}'
@@ -678,12 +678,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -695,7 +695,7 @@ class TestCorpusService(BaseTestCase):
                 )
             )
             response = self.client.delete(
-                f'/corpus/1',
+                f'/api/corpus/1',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -718,14 +718,14 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='admin@admin.com', password='admin')
                 ),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -737,7 +737,7 @@ class TestCorpusService(BaseTestCase):
                 )
             )
             response = self.client.delete(
-                f'/corpus/1',
+                f'/api/corpus/1',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -758,14 +758,14 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(
                     dict(email='another@another.com', password='another')
                 ),
                 content_type='application/json'
             )
             response = self.client.post(
-                '/corpus',
+                '/api/corpus',
                 data=dict(
                     file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
                     data='{"title": "les miserables", "category_id": 1}'
@@ -777,7 +777,7 @@ class TestCorpusService(BaseTestCase):
                 )
             )
             response = self.client.delete(
-                f'/corpus/1',
+                f'/api/corpus/1',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
@@ -798,12 +798,12 @@ class TestCorpusService(BaseTestCase):
 
         with self.client:
             resp_login = self.client.post(
-                '/auth/login',
+                '/api/auth/login',
                 data=json.dumps(dict(email='test@test.com', password='test')),
                 content_type='application/json'
             )
             response = self.client.delete(
-                '/corpus/999999999',
+                '/api/corpus/999999999',
                 headers=dict(
                     Authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
