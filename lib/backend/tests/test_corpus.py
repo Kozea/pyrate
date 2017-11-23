@@ -222,7 +222,7 @@ class TestCorpusService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
 
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 404)
             self.assertIn('error', data['status'])
             self.assertIn(
                 'Category 999999999 does not exist.', data['message']
@@ -360,7 +360,7 @@ class TestCorpusService(BaseTestCase):
                 )
             )
             data = json.loads(response.data.decode())
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 404)
             self.assertIn('Category 1 does not exist.', data['message'])
             self.assertIn('error', data['status'])
 
@@ -811,6 +811,6 @@ class TestCorpusService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
 
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 404)
             self.assertIn('error', data['status'])
             self.assertIn('Text 999999999 does not exist.', data['message'])
