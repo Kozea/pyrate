@@ -1,6 +1,9 @@
 # Atom
 .ropeproject/
 
+# Pycharm
+.idea/
+
 # Python
 *.pyc
 *.pyo
