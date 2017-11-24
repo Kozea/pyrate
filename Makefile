@@ -116,5 +116,7 @@ recreate_db:
 seed_db:
 	$(FLASK) seed_db
 
+recreate_seed_db: recreate_db seed_db
+
 db:
 	$(FLASK) db ${COMMAND}
