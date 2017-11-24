@@ -6,7 +6,7 @@ import AddCorpus from '../containers/AddCorpus'
 import DisplayCatList from '../containers/DisplayCategories'
 import DisplayTextsList from '../containers/DisplayTexts'
 import DisplayCorpusList from '../containers/DisplayCorpus'
-import TextGenerator from '../containers/DisplayTextGenerator'
+import TextGenerator from '../components/TextGeneratorBis'
 import DisplayAlgoList from '../containers/DisplayAlgorithmes'
 
 export default function App() {

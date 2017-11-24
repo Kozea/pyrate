@@ -124,6 +124,12 @@ def generate_text():
     if response_object:
         return jsonify(response_object), 400
 
+    print("=============")
+    print(algo.label)
+    print(category_id)
+    print(algo.is_trained(category_id))
+    print("=============")
+
     if not algo.is_trained(category_id):
         response_object = {
             'status': 'fail',

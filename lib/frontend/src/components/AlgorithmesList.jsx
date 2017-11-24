@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 // TODO: handle trainings to dipslay on which corpus algo is trained
 const AlgorithmesList = ({ algorithmes }) => (
-  <div> {console.log(algorithmes)}
+  <div>
     Liste des Algorithmes disponibles :
     <ul>
       {algorithmes.map(algorithm => (
