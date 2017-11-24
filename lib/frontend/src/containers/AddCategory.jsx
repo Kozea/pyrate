@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { addCategory } from '../actions'
 
-let AddCategory = ({ dispatch }) => {
+const AddCategory = ({ dispatch }) => {
   let input
 
   return (
@@ -28,6 +28,5 @@ let AddCategory = ({ dispatch }) => {
     </div>
   )
 }
-AddCategory = connect()(AddCategory)
 
-export default AddCategory
+export default connect()(AddCategory)
