@@ -28,10 +28,10 @@ bcrypt.init_app(app)
 migrate.init_app(app, db)
 
 from .corpus.corpus import corpus_blueprint  # noqa: E402
-from .corpus.models import Corpus_category, Corpus_text  #noqa E402
+from .corpus.models import Corpus_category, Corpus_text  # noqa: E402
 from .users.auth import auth_blueprint  # noqa: E402
 from .users.users import users_blueprint  # noqa: E402
-from .users.models import User #noqa: E402
+from .users.models import User  # noqa: E402
 from .generator.generator import generator_blueprint  # noqa: E402
 from .generator.models import Algorithm  # noqa: E402
 

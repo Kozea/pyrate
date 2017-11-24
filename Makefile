@@ -116,7 +116,8 @@ recreate_db:
 seed_db:
 	$(FLASK) seed_db
 
-recreate_seed_db: recreate_db seed_db
+init_db: recreate_db seed_db
 
+# migrate commands
 db:
 	$(FLASK) db ${COMMAND}
