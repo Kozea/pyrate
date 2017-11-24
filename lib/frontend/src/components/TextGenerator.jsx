@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const TextGenerator = ({ algorithmes, categories}) => (
+const TextGenerator = ({ algorithmes, categories, text, genText}) => (
   <div>
     <form>
       Algorithmes displonibles : <select name="algo">
@@ -19,7 +19,7 @@ const TextGenerator = ({ algorithmes, categories}) => (
        ))}
     </select>
     <button>Génère un texte !!</button>
-    <textarea name="message" rows="10" cols="30">
+    <textarea name="message" rows="10" cols="30">{text}
     </textarea>
    </form>
   </div>
@@ -38,6 +38,7 @@ TextGenerator.propTypes = {
       label: PropTypes.string.isRequired,
     }).isRequired
   ).isRequired,
+  text: PropTypes.string.isRequired
 }
 
 export default TextGenerator

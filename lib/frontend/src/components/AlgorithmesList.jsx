@@ -15,17 +15,12 @@ const AlgorithmesList = ({ algorithmes }) => (
   </div>
 )
 
+// TODO: training propTypes
 AlgorithmesList.propTypes = {
   algorithmes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       label: PropTypes.string.isRequired,
-      training: PropTypes.objectOf(
-        PropTypes.shape({
-          category_id: PropTypes.number.isRequired,
-          last_train: PropTypes.string.isRequired,
-        }),
-      ),
     }).isRequired
   ).isRequired,
 }

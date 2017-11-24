@@ -9,8 +9,7 @@ import thunk from 'redux-thunk';
 import pyrateApp from './reducers'
 import App from './components/App'
 
-import { loadCategories, loadAlgorithmes, generateText } from './actions'
-
+import { loadCategories, loadAlgorithmes } from './actions'
 
 import { debug } from './config'
 
@@ -18,7 +17,6 @@ let store = createStore(pyrateApp, applyMiddleware(thunk))
 
 store.dispatch(loadCategories());
 store.dispatch(loadAlgorithmes());
-store.dispatch(generateText());
 
 export const rootNode = document.getElementById('root')
 
