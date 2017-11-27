@@ -10,26 +10,22 @@ class NavBar extends React.Component {
   constructor (props, context) {
     super(props, context)
     this.state = {
-      isAuthenticated: this.props.isAuthenticated,
       formData: {
         username: '',
         email: '',
         password: ''
       },
-      authMessage: '',
+      message: this.props.message,
       user: this.props.user,
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.isAuthenticated !== nextProps.isAuthenticated) {
-      this.setState({ isAuthenticated: nextProps.isAuthenticated })
-    }
-    if (this.props.authMessage !== nextProps.authMessage) {
-      this.setState({ authMessage: nextProps.authMessage })
-    }
     if (this.props.user !== nextProps.user) {
       this.setState({ user: nextProps.user })
+    }
+    if (this.props.message !== nextProps.message) {
+      this.setState({ message: nextProps.message })
     }
   }
 
@@ -69,7 +65,7 @@ class NavBar extends React.Component {
     return (
       <div>
         <h1>PyRaTe</h1>
-        {!this.state.isAuthenticated &&
+        {!this.state.user &&
           <div>
             <form onSubmit={event => this.formPreventDefault(event)} >
               <input
@@ -100,9 +96,9 @@ class NavBar extends React.Component {
             </form>
           </div>
         }
-        {this.state.isAuthenticated &&
+        {this.state.user &&
           <div>
-            Hello !
+            Hello {this.state.user.username} !
             <button
               onClick={event => this.logout(event)}
             >
@@ -110,7 +106,7 @@ class NavBar extends React.Component {
             </button>
           </div>
         }
-        {this.state.authMessage}
+        {this.state.message}
       </div>
     )
   }
@@ -119,8 +115,8 @@ class NavBar extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    isAuthenticated: state.isAuthenticated,
-    user: state.user
+    user: state.user,
+    message: state.message
   }
 }
 function mapDispatchToProps(dispatch) {
@@ -131,7 +127,7 @@ function mapDispatchToProps(dispatch) {
 
 NavBar.propTypes = {
   actions: PropTypes.object.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired,
+  message: PropTypes.string.isRequired,
   user: PropTypes.shape({
       username: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
