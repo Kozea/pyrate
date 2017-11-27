@@ -1,7 +1,6 @@
 import React from 'react'
 
 import NavBar from '../containers/NavBar'
-import AddCategory from '../containers/AddCategory'
 import AddCorpus from '../containers/AddCorpus'
 import DisplayCatList from '../containers/DisplayCategories'
 import DisplayTextsList from '../containers/DisplayTexts'
@@ -17,7 +16,6 @@ export default function App() {
       <hr />
       <hr />
       <DisplayCatList />
-      <AddCategory />
       <hr />
       <DisplayTextsList />
 

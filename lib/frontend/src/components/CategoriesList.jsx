@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { deleteCategory, addCategory } from '../actions'
-// import DeleteCat from '../containers/DeleteCat'
 
 function CategoriesList({ categories, btnClick, addCat }) {
   let input
