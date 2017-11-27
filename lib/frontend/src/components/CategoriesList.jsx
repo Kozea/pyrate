@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { deleteCategory, addCategory } from '../actions'
+import { deleteCategory, addCategory, updateCategory } from '../actions'
 
-function CategoriesList({ categories, btnClick, addCat }) {
+function CategoriesList({ categories, btnClick, editClick, addCat }) {
   let input
   return (
     <div>
@@ -19,6 +19,14 @@ function CategoriesList({ categories, btnClick, addCat }) {
               }}
             >
               Supprimer
+            </button>
+            <button
+              onClick={e => {
+                e.preventDefault()
+                editClick(category.id)
+              }}
+            >
+              Modifer
             </button>
           </li>
         ))}
@@ -48,6 +56,7 @@ export default connect(
   function mapDispatchToProps(dispatch) {
     return {
       btnClick: data => dispatch(deleteCategory(data)),
+      editClick: data => dispatch(updateCategory(data)),
       addCat: data => dispatch(addCategory(data)),
     }
   }
