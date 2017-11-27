@@ -8,7 +8,7 @@ const AddCategory = ({ dispatch }) => {
 
   return (
     <div>
-      <form
+      {/* <form
         onSubmit={e => {
           e.preventDefault()
           if (!input.value.trim()) {
@@ -24,7 +24,7 @@ const AddCategory = ({ dispatch }) => {
           }}
         />
         <button type="submit">Ajouter une catégorie</button>
-      </form>
+      </form> */}
     </div>
   )
 }
