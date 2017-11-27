@@ -34,7 +34,7 @@ class NavBar extends React.Component {
   }
 
   handleFormChange(event) {
-    const formData = this.state.formData
+    const { formData } = this.state
     formData[event.target.name] = event.target.value
     this.forceUpdate()
   }
