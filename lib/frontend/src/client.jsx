@@ -7,13 +7,14 @@ import thunk from 'redux-thunk'
 
 import pyrateApp from './reducers'
 import App from './components/App'
-import { loadCategories, loadAlgorithmes } from './actions'
+import { loadCategories, loadAlgorithmes, isLogged } from './actions'
 import { debug } from './config'
 
 const store = createStore(pyrateApp, applyMiddleware(thunk))
 
 store.dispatch(loadCategories())
 store.dispatch(loadAlgorithmes())
+store.dispatch(isLogged())
 
 export const rootNode = document.getElementById('root')
 

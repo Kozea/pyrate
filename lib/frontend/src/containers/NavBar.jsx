@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { login, } from '../actions'
+import { login, logout } from '../actions'
 
 class NavBar extends React.Component {
 
@@ -47,6 +47,11 @@ class NavBar extends React.Component {
     )
   }
 
+  logout(event) {
+    event.preventDefault()
+    this.props.actions.logout()
+  }
+
   render() {
     return (
       <div>
@@ -76,7 +81,9 @@ class NavBar extends React.Component {
         {this.state.isAuthenticated &&
           <div>
             <form onSubmit={event => this.formPreventDefault(event)} >
-              <button>
+              <button
+                onClick={event => this.logout(event)}
+              >
                 Logout
               </button>
             </form>
@@ -96,7 +103,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ login, }, dispatch)
+    actions: bindActionCreators({ login, logout }, dispatch)
   }
 }
 
