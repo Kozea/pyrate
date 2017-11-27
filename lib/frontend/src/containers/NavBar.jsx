@@ -16,7 +16,8 @@ class NavBar extends React.Component {
         email: '',
         password: ''
       },
-      authMessage: ''
+      authMessage: '',
+      user: this.props.user,
     }
   }
 
@@ -26,6 +27,9 @@ class NavBar extends React.Component {
     }
     if (this.props.authMessage !== nextProps.authMessage) {
       this.setState({ authMessage: nextProps.authMessage })
+    }
+    if (this.props.user !== nextProps.user) {
+      this.setState({ user: nextProps.user })
     }
   }
 
@@ -98,13 +102,12 @@ class NavBar extends React.Component {
         }
         {this.state.isAuthenticated &&
           <div>
-            <form onSubmit={event => this.formPreventDefault(event)} >
-              <button
-                onClick={event => this.logout(event)}
-              >
-                Logout
-              </button>
-            </form>
+            Hello !
+            <button
+              onClick={event => this.logout(event)}
+            >
+              Logout
+            </button>
           </div>
         }
         {this.state.authMessage}
@@ -117,6 +120,7 @@ class NavBar extends React.Component {
 function mapStateToProps(state) {
   return {
     isAuthenticated: state.isAuthenticated,
+    user: state.user
   }
 }
 function mapDispatchToProps(dispatch) {
@@ -128,6 +132,12 @@ function mapDispatchToProps(dispatch) {
 NavBar.propTypes = {
   actions: PropTypes.object.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
+  user: PropTypes.shape({
+      username: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      isAdmin: PropTypes.bool.isRequired,
+      createdAt: PropTypes.string.isRequired,
+  })
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavBar)
