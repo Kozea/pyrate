@@ -1,19 +1,24 @@
 import React from 'react'
 
-import NavBar from './NavBar'
+import NavBar from '../containers/NavBar'
 import AddCategory from '../containers/AddCategory'
 import AddCorpus from '../containers/AddCorpus'
 import DisplayCatList from '../containers/DisplayCategories'
 import DisplayTextsList from '../containers/DisplayTexts'
 import DisplayCorpusList from '../containers/DisplayCorpus'
+import TextGenerator from '../containers/TextGenerator'
 
 export default function App() {
   return (
     <div>
       <NavBar />
-
-      <AddCategory />
+      <hr />
+      <TextGenerator />
+      <hr />
+      <hr />
       <DisplayCatList />
+      <AddCategory />
+      <hr />
       <DisplayTextsList />
 
       <AddCorpus />

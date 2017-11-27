@@ -11,7 +11,7 @@ class TestUserService(BaseTestCase):
 
     def test_users(self):
         """ => Ensure the /ping route behaves correctly."""
-        response = self.client.get('/ping')
+        response = self.client.get('/api/ping')
         data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
         self.assertIn('pong!', data['message'])
@@ -22,7 +22,7 @@ class TestUserService(BaseTestCase):
         user = add_user('test', 'test@test.com', 'test')
 
         with self.client:
-            response = self.client.get(f'/users/{user.id}')
+            response = self.client.get(f'/api/users/{user.id}')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 200)
@@ -35,7 +35,7 @@ class TestUserService(BaseTestCase):
     def test_single_user_no_id(self):
         """=> Ensure error is thrown if an id is not provided."""
         with self.client:
-            response = self.client.get(f'/users/blah')
+            response = self.client.get(f'/api/users/blah')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 404)
@@ -45,7 +45,7 @@ class TestUserService(BaseTestCase):
     def test_single_user_wrong_id(self):
         """=> Ensure error is thrown if the id does not exist."""
         with self.client:
-            response = self.client.get(f'/users/99999999999')
+            response = self.client.get(f'/api/users/99999999999')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 404)
@@ -57,7 +57,7 @@ class TestUserService(BaseTestCase):
         add_user('test', 'test@test.com', 'test')
         add_user('toto', 'toto@toto.com', 'toto')
         with self.client:
-            response = self.client.get('/users')
+            response = self.client.get('/api/users')
             data = json.loads(response.data.decode())
 
             self.assertEqual(response.status_code, 200)

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { addCorpus } from '../actions'
 
-let AddCorpus = ({ dispatch }) => {
+const AddCorpus = ({ dispatch }) => {
   let input
 
   return (
@@ -28,6 +28,5 @@ let AddCorpus = ({ dispatch }) => {
     </div>
   )
 }
-AddCorpus = connect()(AddCorpus)
 
-export default AddCorpus
+export default connect()(AddCorpus)

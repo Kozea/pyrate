@@ -7,9 +7,9 @@ import { deleteCat } from '../actions'
 
 const CategoriesList = ({ categories, btnClick }) => (
   <div>
-    {/* {console.log(categories)} */}
+    Liste des Catégories :
     <ul>
-      Listes des Catégories ...{categories.map(category => (
+      {categories.map(category => (
         <li key={category.id}>
           {category.label}
           {/* <DeleteCat /> */}

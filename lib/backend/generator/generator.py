@@ -52,6 +52,7 @@ def get_algorithm():
                 'last_train': training.last_train_date
             }
         algo_object = {
+            'id': algo.id,
             'label': algo.label,
             'training': trainings_list
         }
@@ -86,7 +87,7 @@ def train():
                 'message': 'Failed during model training. '
                 'Please verify corpus texts.'
             }
-            return jsonify(response_object), 400
+            return jsonify(response_object), 500
 
         # update date of the last training with the selected category
         training = Training.query.filter_by(algorithm_id=algo.id,
