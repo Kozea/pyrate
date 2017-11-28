@@ -26,18 +26,26 @@ def update_trainings(category_id):
 @corpus_blueprint.route('/categories', methods=['GET'])
 def get_corpus_categories():
     """Get all corpus categories"""
-    categories = Corpus_category.query.all()
-    categories_list = []
-    for category in categories:
-        category_object = {'id': category.id, 'label': category.label}
-        categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'categories': categories_list
+    try:
+        categories = Corpus_category.query.all()
+        categories_list = []
+        for category in categories:
+            category_object = {'id': category.id, 'label': category.label}
+            categories_list.append(category_object)
+        response_object = {
+            'status': 'success',
+            'data': {
+                'categories': categories_list
+            }
         }
-    }
-    return jsonify(response_object), 200
+        return jsonify(response_object), 200
+    except exc.OperationalError as e:
+        appLog.error(e)
+        response_object = {
+            'status': 'error',
+            'message': 'Internal system error'
+        }
+        return jsonify(response_object), 500
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
