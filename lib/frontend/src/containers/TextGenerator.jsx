@@ -6,34 +6,35 @@ import { connect } from 'react-redux'
 import { train, generateText } from '../actions'
 
 class TextGenerator extends React.Component {
-
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = {
       algorithmes: this.props.algorithmes,
       categories: this.props.categories,
       text: this.props.generatedText,
       selectedAlgo: '',
-      selectedCategory: ''
+      selectedCategory: '',
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const selectedAlgo = (nextProps.algorithmes[0])
-      ? nextProps.algorithmes[0].label : ''
-    const selectedCategory = (nextProps.categories[0])
-      ? nextProps.categories[0].id : ''
+    const selectedAlgo = nextProps.algorithmes[0]
+      ? nextProps.algorithmes[0].label
+      : ''
+    const selectedCategory = nextProps.categories[0]
+      ? nextProps.categories[0].id
+      : ''
 
     if (this.props.algorithmes !== nextProps.algorithmes) {
       this.setState({
         algorithmes: nextProps.algorithmes,
-        selectedAlgo: selectedAlgo
+        selectedAlgo: selectedAlgo,
       })
     }
     if (this.props.categories !== nextProps.categories) {
       this.setState({
         categories: nextProps.categories,
-        selectedCategory: selectedCategory
+        selectedCategory: selectedCategory,
       })
     }
     if (this.props.text !== nextProps.text) {
@@ -56,62 +57,48 @@ class TextGenerator extends React.Component {
     event.preventDefault()
     const catId = parseInt(this.state.selectedCategory)
     switch (type) {
-        case 'generate':
-          this.props.actions.generateText(
-            this.state.selectedAlgo,
-            catId)
-          break
-        default:
-          this.props.actions.train(
-            this.state.selectedAlgo,
-            catId)
+      case 'generate':
+        this.props.actions.generateText(this.state.selectedAlgo, catId)
+        break
+      default:
+        this.props.actions.train(this.state.selectedAlgo, catId)
     }
   }
 
   render() {
     return (
       <div>
-        <form onSubmit={event => this.formPreventDefault(event)} >
+        <form onSubmit={event => this.formPreventDefault(event)}>
           Algorithmes displonibles :
-          <select
-           name="algo"
-           onChange={event => this.handleAlgoChange(event)}
-          >
+          <select name="algo" onChange={event => this.handleAlgoChange(event)}>
             {this.state.algorithmes.map(algorithm => (
               <option key={algorithm.id} value={algorithm.label}>
                 {algorithm.label}
               </option>
             ))}
-           </select>
-           Catégories :
-           <select
-            name="cat"
-            onChange={event => this.handleCatChange(event)}
-           >
-             {this.state.categories.map(category => (
-               <option key={category.id} value={category.id}>
-                 {category.label}
-               </option>
-             ))}
-           </select>
-           <button
-             onClick={event => this.runGenText(event, 'train')}
-           >
-             Train
-           </button>
-           <button
-             onClick={event => this.runGenText(event, 'generate')}
-           >
-             Generate
-           </button>
-           <textarea
-             name="message"
-             rows="10"
-             cols="30"
-             value={this.state.text}
-           />
-         </form>
-        </div>
+          </select>
+          Catégories :
+          <select name="cat" onChange={event => this.handleCatChange(event)}>
+            {this.state.categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+          <button onClick={event => this.runGenText(event, 'train')}>
+            Train
+          </button>
+          <button onClick={event => this.runGenText(event, 'generate')}>
+            Generate
+          </button>
+          <textarea
+            name="message"
+            rows="10"
+            cols="30"
+            value={this.state.text}
+          />
+        </form>
+      </div>
     )
   }
 }
@@ -125,7 +112,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ train, generateText }, dispatch)
+    actions: bindActionCreators({ train, generateText }, dispatch),
   }
 }
 
@@ -136,9 +123,9 @@ TextGenerator.propTypes = {
       id: PropTypes.number.isRequired,
       label: PropTypes.string.isRequired,
       training: PropTypes.shape({
-          category_id: PropTypes.number.isRequired,
-          last_train: PropTypes.string.isRequired,
-        })
+        category_id: PropTypes.number.isRequired,
+        last_train: PropTypes.string.isRequired,
+      }),
     }).isRequired
   ).isRequired,
   categories: PropTypes.arrayOf(
@@ -147,8 +134,7 @@ TextGenerator.propTypes = {
       label: PropTypes.string.isRequired,
     }).isRequired
   ).isRequired,
-  generatedText: PropTypes.string
+  generatedText: PropTypes.string,
 }
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(TextGenerator)

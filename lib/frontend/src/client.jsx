@@ -7,11 +7,7 @@ import thunk from 'redux-thunk'
 
 import pyrateApp from './reducers'
 import App from './components/App'
-import {
-  loadCategories,
-  loadAlgorithmes,
-  loadProfile
-} from './actions'
+import { loadCategories, loadAlgorithmes, loadProfile } from './actions'
 import { debug } from './config'
 
 const store = createStore(pyrateApp, applyMiddleware(thunk))
@@ -29,7 +25,8 @@ export const renderRoot = handleError => {
       <Provider store={store}>
         <App />
       </Provider>,
-      rootNode)
+      rootNode
+    )
   } catch (error) {
     handleError(error)
   }
