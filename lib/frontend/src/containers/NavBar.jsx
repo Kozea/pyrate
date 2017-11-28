@@ -44,11 +44,17 @@ class NavBar extends React.Component {
 
   displayForm(event, actionType) {
     event.preventDefault()
-    this.setState({ currentAction: actionType })
+    this.setState({
+      currentAction: actionType,
+      formData: {
+        username: '',
+        email: '',
+        password: '',
+      },
+    })
   }
 
-  submitForm(event) {
-    event.preventDefault()
+  submitForm() {
     switch (this.state.currentAction) {
       case 'login':
         this.props.actions.login(
@@ -68,13 +74,7 @@ class NavBar extends React.Component {
     }
   }
 
-  cancelForm(event) {
-    event.preventDefault()
-    this.setState({ currentAction: 'init' })
-  }
-
-  logout(event) {
-    event.preventDefault()
+  cancelFormOrLogout() {
     this.props.actions.logout()
     this.setState({ currentAction: 'init' })
   }
@@ -117,14 +117,14 @@ class NavBar extends React.Component {
                 onChange={event => this.handleFormChange(event)}
               />
               <button onClick={event => this.submitForm(event)}>Submit</button>
-              <button onClick={event => this.cancelForm(event)}>Cancel</button>
+              <button onClick={() => this.cancelFormOrLogout()}>Cancel</button>
             </form>
           </div>
         )}
         {this.state.currentAction === 'isLogged' && (
           <div>
             Hello {this.state.user.username} !
-            <button onClick={event => this.logout(event)}>Logout</button>
+            <button onClick={() => this.cancelFormOrLogout()}>Logout</button>
           </div>
         )}
         {this.state.message}
