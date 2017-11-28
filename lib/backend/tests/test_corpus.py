@@ -176,7 +176,7 @@ class TestCorpusService(BaseTestCase):
         user = add_user('test', 'test@test.com', 'test')
         cat = add_category('romans', user.id)
 
-        user2 = add_user('another', 'another@another.com', 'another')
+        add_user('another', 'another@another.com', 'another')
 
         with self.client:
             resp_login = self.client.post(
@@ -288,8 +288,7 @@ class TestCorpusService(BaseTestCase):
         """=> Ensure an existing category can't be updated in the database."""
         user = add_user('test', 'test@test.com', 'test')
         cat = add_category('romans', user.id)
-
-        user2 = add_user('another', 'another@another.com', 'another')
+        add_user('another', 'another@another.com', 'another')
 
         with self.client:
             resp_login = self.client.post(
@@ -367,7 +366,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus(self):
         """=> Ensure add a text in corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -397,7 +396,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_duplicate_text_in_corpus(self):
         """=> Ensure error is thrown if a duplicate text is added."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -442,7 +441,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_unallowed_file(self):
         """=> Ensure error is thrown if text file extension is not allowed."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -472,7 +471,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_empty_file(self):
         """=> Ensure error is thrown if text file is empty."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -502,7 +501,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_no_file(self):
         """=> Ensure error is thrown if no text file is provided."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -532,7 +531,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_no_file2(self):
         """=> Ensure error is thrown if no text file is provided."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -561,7 +560,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_no_data(self):
         """=> Ensure error is thrown if text details are not provided."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -590,7 +589,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_no_form(self):
         """=> Ensure error is thrown if the payload is not valid."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -616,7 +615,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_without_title(self):
         """=> Ensure error is thrown if text title not provided."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -645,7 +644,7 @@ class TestCorpusService(BaseTestCase):
     def test_add_text_in_corpus_without_category(self):
         """=> Ensure error is thrown if text category not provided."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -671,10 +670,42 @@ class TestCorpusService(BaseTestCase):
             self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
+    def test_get_text(self):
+        """=> Ensure get all texts behaves correctly."""
+        with self.client:
+            response = self.client.get('/api/corpus')
+            data = json.loads(response.data.decode())
+            print(data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+
+    def test_get_text_for_category(self):
+        """=> Ensure get all texts for a corpus category behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        add_category('romans', user.id)
+        with self.client:
+            response = self.client.get('/api/corpus/cat/1')
+            data = json.loads(response.data.decode())
+            print(data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+
+    def test_get_text_for_non_exiting_category(self):
+        """=> Ensure get all texts for a corpus category behaves correctly."""
+        user = add_user('test', 'test@test.com', 'test')
+        add_category('romans', user.id)
+        with self.client:
+            response = self.client.get('/api/corpus/cat/9999999999999')
+            data = json.loads(response.data.decode())
+            print(data)
+            self.assertEqual(response.status_code, 404)
+            self.assertIn('fail', data['status'])
+            self.assertIn('Category does not exist.', data['message'])   
+
     def test_delete_corpus(self):
         """=> Ensure delete a text from a corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         with self.client:
             resp_login = self.client.post(
@@ -710,7 +741,7 @@ class TestCorpusService(BaseTestCase):
     def test_delete_corpus_admin(self):
         """=> Ensure delete a text from a corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
+        add_category('romans', user.id)
 
         admin = add_user('admin', 'admin@admin.com', 'admin')
         admin.admin = True
@@ -752,9 +783,8 @@ class TestCorpusService(BaseTestCase):
     def test_delete_corpus_no_admin(self):
         """=> Ensure delete a text from a corpus behaves correctly."""
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('romans', user.id)
-
-        user2 = add_user('another', 'another@another.com', 'another')
+        add_category('romans', user.id)
+        add_user('another', 'another@another.com', 'another')
 
         with self.client:
             resp_login = self.client.post(

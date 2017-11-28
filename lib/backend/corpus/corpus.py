@@ -200,8 +200,37 @@ def get_corpus():
             'owner': text.author_id
         }
         corpus_list.append(text_object)
-    response_object = {'status': 'success', 'data': {'text': corpus_list}}
+    response_object = {'status': 'success', 'data': {'texts': corpus_list}}
     return jsonify(response_object), 200
+
+
+@corpus_blueprint.route('/corpus/cat/<cat_id>', methods=['GET'])
+def get_cat_corpus(cat_id):
+    """Get all texts for a selected category"""
+    response_object = {'status': 'fail', 'message': 'Category does not exist.'}
+    try:
+        category = Corpus_category.query.filter_by(id=cat_id).first()
+        if not category:
+            return jsonify(response_object), 404
+        else:
+            corpus = Corpus_text.query.filter_by(category_id=cat_id).all()
+            corpus_list = []
+            for text in corpus:
+                text_object = {
+                    'id': text.id,
+                    'title': text.title,
+                    'creation_date': text.creation_date,
+                    'owner': text.author_id
+                }
+                corpus_list.append(text_object)
+            response_object = {
+                'status': 'success',
+                'data': {'texts': corpus_list}
+            }
+            return jsonify(response_object), 200
+    except ValueError as e:
+        appLog.error(e)
+        return jsonify(response_object), 404
 
 
 @corpus_blueprint.route('/corpus', methods=['POST'])
