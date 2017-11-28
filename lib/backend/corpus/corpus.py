@@ -26,18 +26,26 @@ def update_trainings(category_id):
 @corpus_blueprint.route('/categories', methods=['GET'])
 def get_corpus_categories():
     """Get all corpus categories"""
-    categories = Corpus_category.query.all()
-    categories_list = []
-    for category in categories:
-        category_object = {'id': category.id, 'label': category.label}
-        categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'categories': categories_list
+    try:
+        categories = Corpus_category.query.all()
+        categories_list = []
+        for category in categories:
+            category_object = {'id': category.id, 'label': category.label}
+            categories_list.append(category_object)
+        response_object = {
+            'status': 'success',
+            'data': {
+                'categories': categories_list
+            }
         }
-    }
-    return jsonify(response_object), 200
+        return jsonify(response_object), 200
+    except exc.OperationalError as e:
+        appLog.error(e)
+        response_object = {
+            'status': 'error',
+            'message': 'Internal system error'
+        }
+        return jsonify(response_object), 500
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
@@ -108,7 +116,7 @@ def delete_corpus_category(user_id, cat_id):
             'status': 'error',
             'message': f'Category {cat_id} does not exist.'
         }
-        return jsonify(response_object), 400
+        return jsonify(response_object), 404
 
     if not is_admin(user_id) and cat.owner_id != user_id:
         response_object = {
@@ -154,7 +162,7 @@ def update_corpus_category(user_id, cat_id):
             'status': 'error',
             'message': f'Category {cat_id} does not exist.'
         }
-        return jsonify(response_object), 400
+        return jsonify(response_object), 404
 
     if not is_admin(user_id) and cat.owner_id != user_id:
         response_object = {
@@ -187,10 +195,9 @@ def get_corpus():
         text_object = {
             'id': text.id,
             'title': text.title,
-            'filename': text.filename,
             'category_id': text.category_id,
             'creation_date': text.creation_date,
-            'author': text.author_id
+            'owner': text.author_id
         }
         corpus_list.append(text_object)
     response_object = {'status': 'success', 'data': {'text': corpus_list}}
@@ -279,7 +286,7 @@ def delete_corpus_text(user_id, text_id):
             'status': 'error',
             'message': f'Text {text_id} does not exist.'
         }
-        return jsonify(response_object), 400
+        return jsonify(response_object), 404
 
     cat = Corpus_category.query.filter_by(id=text.category_id).first()
     if not is_admin(user_id) and cat.owner_id != user_id:

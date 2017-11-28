@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 
+from ..utils import authenticate
 from .models import User
 
 users_blueprint = Blueprint('users', __name__)
@@ -20,6 +21,30 @@ def get_users():
         users_list.append(user_object)
     response_object = {'status': 'success', 'data': {'users': users_list}}
     return jsonify(response_object), 200
+
+
+@users_blueprint.route('/profile', methods=['GET'])
+@authenticate
+def profile(user_id):
+    """Get connected user details"""
+    response_object = {'status': 'fail', 'message': 'User does not exist'}
+    try:
+        user = User.query.filter_by(id=int(user_id)).first()
+        if not user:
+            return jsonify(response_object), 404
+        else:
+            response_object = {
+                'status': 'success',
+                'data': {
+                    'username': user.username,
+                    'email': user.email,
+                    'created_at': user.created_at,
+                    'is_admin': user.admin
+                }
+            }
+            return jsonify(response_object), 200
+    except ValueError:
+        return jsonify(response_object), 404
 
 
 @users_blueprint.route('/users/<user_id>', methods=['GET'])

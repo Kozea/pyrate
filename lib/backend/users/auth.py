@@ -73,7 +73,7 @@ def login_user():
         else:
             response_object = {
                 'status': 'error',
-                'message': 'User does not exist.'
+                'message': 'Invalid credentials.'
             }
             return jsonify(response_object), 404
     # handler errors

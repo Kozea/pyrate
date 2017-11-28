@@ -1,5 +1,6 @@
 import locale
 import logging
+import os
 import unittest
 
 from flask import Flask
@@ -27,8 +28,10 @@ bcrypt.init_app(app)
 migrate.init_app(app, db)
 
 from .corpus.corpus import corpus_blueprint  # noqa: E402
+from .corpus.models import Corpus_category, Corpus_text  # noqa: E402
 from .users.auth import auth_blueprint  # noqa: E402
 from .users.users import users_blueprint  # noqa: E402
+from .users.models import User  # noqa: E402
 from .generator.generator import generator_blueprint  # noqa: E402
 from .generator.models import Algorithm  # noqa: E402
 
@@ -76,6 +79,23 @@ def seed_db():
     db.session.add(Algorithm(
         label='MarkovChain'
         ))
+    db.session.add(User(
+        username='admin',
+        email='admin@example.com',
+        password='admin'
+    ))
+    db.session.add(Corpus_category(
+        label='Romans',
+        owner_id=1
+    ))
+    db.session.add(Corpus_text(
+        title="Les Misérables Tome 1",
+        filename=os.path.join(
+            app.config['UPLOAD_FOLDER'],
+            "1/miserables_t1.txt"),
+        category_id=1,
+        author_id=1
+    ))
     db.session.commit()
 
 

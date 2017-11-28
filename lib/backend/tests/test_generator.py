@@ -185,7 +185,7 @@ class TestGeneratorService(BaseTestCase):
             )
             data = json.loads(response.data.decode())
 
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 500)
             self.assertIn('fail', data['status'])
             self.assertIn('Failed during model training. Please verify corpus texts.',
                           data['message'])

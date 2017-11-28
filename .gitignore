@@ -1,6 +1,9 @@
 # Atom
 .ropeproject/
 
+# Pycharm
+.idea/
+
 # Python
 *.pyc
 *.pyo
@@ -19,6 +22,7 @@ lib/backend/trainings/markovify/*.json
 lib/backend/trainings/MarkovChain/*.model
 lib/backend/uploads/*/*.txt
 lib/backend/uploads/*/*.pdf
+!lib/backend/uploads/1/miserables_t1.txt
 lib/backend/tests/trainings/markovify/*.json
 lib/backend/tests/trainings/MarkovChain/*.model
 lib/backend/tests/uploads/

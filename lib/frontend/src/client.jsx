@@ -1,16 +1,32 @@
 import React from 'react'
 import { hydrate, render } from 'react-dom'
 import RedBox from 'redbox-react'
+import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk'
 
+import pyrateApp from './reducers'
 import App from './components/App'
+import { loadCategories, loadAlgorithmes, loadProfile } from './actions'
 import { debug } from './config'
+
+const store = createStore(pyrateApp, applyMiddleware(thunk))
+
+store.dispatch(loadCategories())
+store.dispatch(loadAlgorithmes())
+store.dispatch(loadProfile())
 
 export const rootNode = document.getElementById('root')
 
 export const renderRoot = handleError => {
   try {
     const renderMode = debug ? render : hydrate
-    renderMode(<App />, rootNode)
+    renderMode(
+      <Provider store={store}>
+        <App />
+      </Provider>,
+      rootNode
+    )
   } catch (error) {
     handleError(error)
   }
