@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { loadCorpusTexts } from '../actions'
+import { loadCorpusTexts, addCorpusTexts } from '../actions'
 
 class Corpus extends React.Component {
   constructor(props, context) {
@@ -13,6 +13,7 @@ class Corpus extends React.Component {
       corpusTexts: this.props.corpusTexts,
       message: this.props.message,
       selectedCategory: '',
+      user: this.props.user,
     }
   }
 
@@ -34,15 +35,28 @@ class Corpus extends React.Component {
     if (this.props.message !== nextProps.message) {
       this.setState({ message: nextProps.message })
     }
-  }
-
-  formPreventDefault(event) {
-    event.preventDefault()
+    if (this.props.user !== nextProps.user) {
+      this.setState({ user: nextProps.user })
+    }
   }
 
   handleCatChange(event) {
     this.setState({ selectedCategory: event.target.value })
     this.props.actions.loadCorpusTexts(event.target.value)
+  }
+
+  uploadFile(event) {
+    event.preventDefault()
+
+    const form = new FormData()
+    form.append('file', event.target.textFile.files[0])
+    form.append(
+      'data',
+      `{"title": ${event.target.title.value}, "category_id": ${
+        this.state.selectedCategory
+      }}`
+    )
+    this.props.actions.addCorpusTexts(form)
   }
 
   render() {
@@ -63,12 +77,21 @@ class Corpus extends React.Component {
             </li>
           ))}
         </ul>
-        <br />
-        Ajouter un text au corpus :
-        <form onSubmit={event => this.formPreventDefault(event)}>
-          <input type="file" name="textFile" />
-          <button>Envoyer</button>
-        </form>
+        {this.state.user && (
+          <div>
+            <br />
+            Ajouter un texte au corpus :
+            <form
+              encType="multipart/form-data"
+              onSubmit={event => this.uploadFile(event)}
+            >
+              <input name="title" placeholder="titre" required />
+              <input type="file" name="textFile" accept=".txt" required />
+              <br />
+              <button type="submit">Envoyer</button>
+            </form>
+          </div>
+        )}
       </div>
     )
   }
@@ -79,12 +102,13 @@ function mapStateToProps(state) {
     categories: state.categories,
     corpusTexts: state.corpusTexts,
     message: state.message,
+    user: state.user,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ loadCorpusTexts }, dispatch),
+    actions: bindActionCreators({ loadCorpusTexts, addCorpusTexts }, dispatch),
   }
 }
 
@@ -104,6 +128,12 @@ Corpus.propTypes = {
     })
   ).isRequired,
   message: PropTypes.string.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
+    createdAt: PropTypes.string.isRequired,
+  }),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Corpus)
