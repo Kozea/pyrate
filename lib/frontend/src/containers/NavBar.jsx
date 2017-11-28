@@ -9,6 +9,7 @@ class NavBar extends React.Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
+      currentAction: 'init',
       formData: {
         username: '',
         email: '',
@@ -26,6 +27,9 @@ class NavBar extends React.Component {
     if (this.props.message !== nextProps.message) {
       this.setState({ message: nextProps.message })
     }
+    if (nextProps.user !== null) {
+      this.setState({ currentAction: 'isLogged' })
+    }
   }
 
   formPreventDefault(event) {
@@ -38,39 +42,69 @@ class NavBar extends React.Component {
     this.forceUpdate()
   }
 
-  login(event) {
+  displayForm(event, actionType) {
     event.preventDefault()
-    this.props.actions.login(
-      this.state.formData.email,
-      this.state.formData.password
-    )
+    this.setState({ currentAction: actionType })
   }
 
-  register(event) {
+  submitForm(event) {
     event.preventDefault()
-    this.props.actions.register(
-      this.state.formData.username,
-      this.state.formData.email,
-      this.state.formData.password
-    )
+    switch (this.state.currentAction) {
+      case 'login':
+        this.props.actions.login(
+          this.state.formData.email,
+          this.state.formData.password
+        )
+        break
+      case 'register':
+        this.props.actions.register(
+          this.state.formData.username,
+          this.state.formData.email,
+          this.state.formData.password
+        )
+        break
+      default:
+        this.setState({ currentAction: 'init' })
+    }
+  }
+
+  cancelForm(event) {
+    event.preventDefault()
+    this.setState({ currentAction: 'init' })
   }
 
   logout(event) {
     event.preventDefault()
     this.props.actions.logout()
+    this.setState({ currentAction: 'init' })
   }
 
   render() {
     return (
       <div>
         <h1>PyRaTe</h1>
-        {!this.state.user && (
+
+        {this.state.currentAction === 'init' && (
+          <div>
+            <button onClick={event => this.displayForm(event, 'login')}>
+              Login
+            </button>
+            <button onClick={event => this.displayForm(event, 'register')}>
+              Register
+            </button>
+          </div>
+        )}
+        {(this.state.currentAction === 'login' ||
+          this.state.currentAction === 'register') && (
           <div>
             <form onSubmit={event => this.formPreventDefault(event)}>
-              <input
-                name="username"
-                onChange={event => this.handleFormChange(event)}
-              />
+              {this.state.currentAction === 'register' && (
+                <input
+                  name="username"
+                  required
+                  onChange={event => this.handleFormChange(event)}
+                />
+              )}
               <input
                 name="email"
                 required
@@ -82,12 +116,12 @@ class NavBar extends React.Component {
                 required
                 onChange={event => this.handleFormChange(event)}
               />
-              <button onClick={event => this.login(event)}>Login</button>
-              <button onClick={event => this.register(event)}>Register</button>
+              <button onClick={event => this.submitForm(event)}>Submit</button>
+              <button onClick={event => this.cancelForm(event)}>Cancel</button>
             </form>
           </div>
         )}
-        {this.state.user && (
+        {this.state.currentAction === 'isLogged' && (
           <div>
             Hello {this.state.user.username} !
             <button onClick={event => this.logout(event)}>Logout</button>
