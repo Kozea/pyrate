@@ -101,18 +101,22 @@ class NavBar extends React.Component {
               {this.state.currentAction === 'register' && (
                 <input
                   name="username"
+                  placeholder="username"
                   required
                   onChange={event => this.handleFormChange(event)}
                 />
               )}
               <input
                 name="email"
+                type="email"
+                placeholder="email"
                 required
                 onChange={event => this.handleFormChange(event)}
               />
               <input
                 name="password"
                 type="password"
+                placeholder="password"
                 required
                 onChange={event => this.handleFormChange(event)}
               />
