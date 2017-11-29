@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { loadCorpusTexts, addCorpusTexts } from '../actions'
+import { loadCorpusTexts, addCorpusTexts, deleteCorpusTexts } from '../actions'
 
 class Corpus extends React.Component {
   constructor(props, context) {
@@ -58,6 +58,10 @@ class Corpus extends React.Component {
     this.props.actions.addCorpusTexts(form, this.state.selectedCategory)
   }
 
+  deleteFile(textId) {
+    this.props.actions.deleteCorpusTexts(textId, this.state.selectedCategory)
+  }
+
   render() {
     return (
       <div>
@@ -73,6 +77,11 @@ class Corpus extends React.Component {
           {this.state.corpusTexts.map(text => (
             <li key={text.id}>
               {text.title} (ajouté le {text.creation_date})
+              {this.state.user && (
+                <button type="submit" onClick={() => this.deleteFile(text.id)}>
+                  Supprimer
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -107,7 +116,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ loadCorpusTexts, addCorpusTexts }, dispatch),
+    actions: bindActionCreators(
+      { loadCorpusTexts, addCorpusTexts, deleteCorpusTexts },
+      dispatch
+    ),
   }
 }
 
