@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 
 from .. import app, appLog, db
 from ..generator.models import Training
+from ..users.models import User
 from ..utils import allowed_file, authenticate, is_admin
 from .models import Corpus_category, Corpus_text
 
@@ -26,18 +27,33 @@ def update_trainings(category_id):
 @corpus_blueprint.route('/categories', methods=['GET'])
 def get_corpus_categories():
     """Get all corpus categories"""
-    categories = Corpus_category.query.all()
-    categories_list = []
-    for category in categories:
-        category_object = {'id': category.id, 'label': category.label}
-        categories_list.append(category_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'categories': categories_list
+    try:
+        categories = Corpus_category.query.all()
+        categories_list = []
+        for category in categories:
+            user = User.query.filter_by(id=category.owner_id).first()
+            category_object = {
+                'id': category.id,
+                'label': category.label,
+                'is_private': category.private,
+                'owner_id': category.owner_id,
+                'owner_username': user.username
+            }
+            categories_list.append(category_object)
+        response_object = {
+            'status': 'success',
+            'data': {
+                'categories': categories_list
+            }
         }
-    }
-    return jsonify(response_object), 200
+        return jsonify(response_object), 200
+    except exc.OperationalError as e:
+        appLog.error(e)
+        response_object = {
+            'status': 'error',
+            'message': 'Internal system error'
+        }
+        return jsonify(response_object), 500
 
 
 @corpus_blueprint.route('/categories/<cat_id>', methods=['GET'])
@@ -49,10 +65,14 @@ def get_corpus_category(cat_id):
         if not category:
             return jsonify(response_object), 404
         else:
+            user = User.query.filter_by(id=category.owner_id).first()
             response_object = {
                 'status': 'success',
                 'data': {
-                    'label': category.label
+                    'label': category.label,
+                    'is_private': category.private,
+                    'owner_id': category.owner_id,
+                    'owner_username': user.username
                 }
             }
             return jsonify(response_object), 200
@@ -184,16 +204,49 @@ def get_corpus():
     corpus = Corpus_text.query.all()
     corpus_list = []
     for text in corpus:
+        user = User.query.filter_by(id=text.author_id).first()
         text_object = {
             'id': text.id,
             'title': text.title,
             'category_id': text.category_id,
             'creation_date': text.creation_date,
-            'owner': text.author_id
+            'owner_id': text.author_id,
+            'owner_username': user.username
         }
         corpus_list.append(text_object)
-    response_object = {'status': 'success', 'data': {'text': corpus_list}}
+    response_object = {'status': 'success', 'data': {'texts': corpus_list}}
     return jsonify(response_object), 200
+
+
+@corpus_blueprint.route('/corpus/cat/<cat_id>', methods=['GET'])
+def get_cat_corpus(cat_id):
+    """Get all texts for a selected category"""
+    response_object = {'status': 'fail', 'message': 'Category does not exist.'}
+    try:
+        category = Corpus_category.query.filter_by(id=cat_id).first()
+        if not category:
+            return jsonify(response_object), 404
+        else:
+            corpus = Corpus_text.query.filter_by(category_id=cat_id).all()
+            corpus_list = []
+            for text in corpus:
+                user = User.query.filter_by(id=text.author_id).first()
+                text_object = {
+                    'id': text.id,
+                    'title': text.title,
+                    'creation_date': text.creation_date,
+                    'owner_id': text.author_id,
+                    'owner_username': user.username
+                }
+                corpus_list.append(text_object)
+            response_object = {
+                'status': 'success',
+                'data': {'texts': corpus_list}
+            }
+            return jsonify(response_object), 200
+    except ValueError as e:
+        appLog.error(e)
+        return jsonify(response_object), 404
 
 
 @corpus_blueprint.route('/corpus', methods=['POST'])
@@ -214,6 +267,15 @@ def add_corpus_text(user_id):
 
     title = post_data['title']
     category_id = post_data['category_id']
+
+    cat = Corpus_category.query.filter_by(id=category_id).first()
+    if not is_admin(user_id) and cat.owner_id != user_id:
+        response_object = {
+            'status': 'error',
+            'message': 'You do not have permission to add'
+            ' a text in this category.'
+        }
+        return jsonify(response_object), 401
 
     if 'file' not in request.files:
         response_object = {'status': 'fail', 'message': 'No file part.'}

@@ -1,6 +1,7 @@
 import datetime
 
 from flask import Blueprint, jsonify, request
+from sqlalchemy import exc
 
 from .. import appLog, db
 from ..corpus.models import Corpus_category
@@ -42,28 +43,36 @@ def verify_payload(request):
 @generator_blueprint.route('/algorithmes', methods=['GET'])
 def get_algorithm():
     """Get all corpus categories"""
-    algos = Algorithm.query.all()
-    algos_list = []
-    for algo in algos:
-        trainings_list = None
-        for training in algo.trainings:
-            trainings_list = {
-                'category_id': training.category_id,
-                'last_train': training.last_train_date
+    try:
+        algos = Algorithm.query.all()
+        algos_list = []
+        for algo in algos:
+            trainings_list = None
+            for training in algo.trainings:
+                trainings_list = {
+                    'category_id': training.category_id,
+                    'last_train': training.last_train_date
+                }
+            algo_object = {
+                'id': algo.id,
+                'label': algo.label,
+                'training': trainings_list
             }
-        algo_object = {
-            'id': algo.id,
-            'label': algo.label,
-            'training': trainings_list
+            algos_list.append(algo_object)
+        response_object = {
+            'status': 'success',
+            'data': {
+                'algorithmes': algos_list
+            }
         }
-        algos_list.append(algo_object)
-    response_object = {
-        'status': 'success',
-        'data': {
-            'algorithmes': algos_list
+        return jsonify(response_object), 200
+    except exc.OperationalError as e:
+        appLog.error(e)
+        response_object = {
+            'status': 'error',
+            'message': 'Internal system error'
         }
-    }
-    return jsonify(response_object), 200
+        return jsonify(response_object), 500
 
 
 @generator_blueprint.route('/train', methods=['POST'])

@@ -79,11 +79,9 @@ def seed_db():
     db.session.add(Algorithm(
         label='MarkovChain'
         ))
-    db.session.add(User(
-        username='admin',
-        email='admin@example.com',
-        password='admin'
-    ))
+    admin = User(username='admin', email='admin@example.com', password='admin')
+    admin.admin = True
+    db.session.add(admin)
     db.session.add(Corpus_category(
         label='Romans',
         owner_id=1

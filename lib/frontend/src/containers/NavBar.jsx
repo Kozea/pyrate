@@ -6,26 +6,29 @@ import { connect } from 'react-redux'
 import { login, logout, register } from '../actions'
 
 class NavBar extends React.Component {
-
-  constructor (props, context) {
+  constructor(props, context) {
     super(props, context)
     this.state = {
-      isAuthenticated: this.props.isAuthenticated,
+      currentAction: 'init',
       formData: {
         username: '',
         email: '',
-        password: ''
+        password: '',
       },
-      authMessage: ''
+      message: this.props.message,
+      user: this.props.user,
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.isAuthenticated !== nextProps.isAuthenticated) {
-      this.setState({ isAuthenticated: nextProps.isAuthenticated })
+    if (this.props.user !== nextProps.user) {
+      this.setState({ user: nextProps.user })
     }
-    if (this.props.authMessage !== nextProps.authMessage) {
-      this.setState({ authMessage: nextProps.authMessage })
+    if (this.props.message !== nextProps.message) {
+      this.setState({ message: nextProps.message })
+    }
+    if (nextProps.user !== null) {
+      this.setState({ currentAction: 'isLogged' })
     }
   }
 
@@ -39,95 +42,123 @@ class NavBar extends React.Component {
     this.forceUpdate()
   }
 
-  login(event) {
+  displayForm(event, actionType) {
     event.preventDefault()
-    this.props.actions.login(
-      this.state.formData.email,
-      this.state.formData.password
-    )
+    this.setState({
+      currentAction: actionType,
+      formData: {
+        username: '',
+        email: '',
+        password: '',
+      },
+    })
   }
 
-  register(event) {
-    event.preventDefault()
-    this.props.actions.register(
-      this.state.formData.username,
-      this.state.formData.email,
-      this.state.formData.password
-    )
+  submitForm() {
+    switch (this.state.currentAction) {
+      case 'login':
+        this.props.actions.login(
+          this.state.formData.email,
+          this.state.formData.password
+        )
+        break
+      case 'register':
+        this.props.actions.register(
+          this.state.formData.username,
+          this.state.formData.email,
+          this.state.formData.password
+        )
+        break
+      default:
+        this.setState({ currentAction: 'init' })
+    }
   }
 
-  logout(event) {
-    event.preventDefault()
+  cancelFormOrLogout() {
     this.props.actions.logout()
+    this.setState({ currentAction: 'init' })
   }
 
   render() {
     return (
       <div>
         <h1>PyRaTe</h1>
-        {!this.state.isAuthenticated &&
+
+        {this.state.currentAction === 'init' && (
           <div>
-            <form onSubmit={event => this.formPreventDefault(event)} >
+            <button onClick={event => this.displayForm(event, 'login')}>
+              Login
+            </button>
+            <button onClick={event => this.displayForm(event, 'register')}>
+              Register
+            </button>
+          </div>
+        )}
+        {(this.state.currentAction === 'login' ||
+          this.state.currentAction === 'register') && (
+          <div>
+            <form onSubmit={event => this.formPreventDefault(event)}>
+              {this.state.currentAction === 'register' && (
+                <input
+                  name="username"
+                  placeholder="username"
+                  required
+                  onChange={event => this.handleFormChange(event)}
+                />
+              )}
               <input
-               name="username"
-               onChange={event => this.handleFormChange(event)}
+                name="email"
+                type="email"
+                placeholder="email"
+                required
+                onChange={event => this.handleFormChange(event)}
               />
               <input
-               name="email"
-               required
-               onChange={event => this.handleFormChange(event)}
+                name="password"
+                type="password"
+                placeholder="password"
+                required
+                onChange={event => this.handleFormChange(event)}
               />
-              <input
-               name="password"
-               type="password"
-               required
-               onChange={event => this.handleFormChange(event)}
-              />
-              <button
-               onClick={event => this.login(event)}
-              >
-                Login
-              </button>
-              <button
-               onClick={event => this.register(event)}
-              >
-                Register
-              </button>
+              <button onClick={event => this.submitForm(event)}>Submit</button>
+              <button onClick={() => this.cancelFormOrLogout()}>Cancel</button>
             </form>
           </div>
-        }
-        {this.state.isAuthenticated &&
+        )}
+        {this.state.currentAction === 'isLogged' && (
           <div>
-            <form onSubmit={event => this.formPreventDefault(event)} >
-              <button
-                onClick={event => this.logout(event)}
-              >
-                Logout
-              </button>
-            </form>
+            Hello {this.state.user.username} !
+            <button onClick={() => this.cancelFormOrLogout()}>Logout</button>
           </div>
-        }
-        {this.state.authMessage}
+        )}
+        {this.state.message}
       </div>
     )
   }
-
 }
 
 function mapStateToProps(state) {
   return {
-    isAuthenticated: state.isAuthenticated,
+    user: state.user,
+    message: state.message,
   }
 }
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ login, logout, register }, dispatch)
+    actions: bindActionCreators({ login, logout, register }, dispatch),
   }
 }
 
 NavBar.propTypes = {
   actions: PropTypes.object.isRequired,
-  isAuthenticated: PropTypes.bool.isRequired,
+  message: PropTypes.string.isRequired,
+  user: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
+    createdAt: PropTypes.string.isRequired,
+  }),
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavBar)

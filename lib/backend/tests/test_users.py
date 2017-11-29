@@ -1,5 +1,6 @@
 import json
 
+from lib.backend import db
 from lib.backend.users.models import User
 
 from base import BaseTestCase
@@ -82,3 +83,43 @@ class TestUserService(BaseTestCase):
         auth_token = user.encode_auth_token(user.id)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(User.decode_auth_token(auth_token), user.id)
+
+    def test_profile(self):
+        """=> Get connected user details"""
+        user = add_user('test', 'test@test.com', 'test')
+        user.admin = True
+        db.session.commit()
+
+        with self.client:
+            resp_login = self.client.post(
+                '/api/auth/login',
+                data=json.dumps(dict(email='test@test.com', password='test')),
+                content_type='application/json'
+            )
+            response = self.client.get(
+                '/api/profile',
+                content_type='application/json',
+                headers=dict(
+                    Authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('success', data['status'])
+            self.assertTrue('created_at' in data['data'])
+            self.assertIn('test', data['data']['username'])
+            self.assertIn('test@test.com', data['data']['email'])
+            self.assertEqual(data['data']['is_admin'], True)
+
+    def test_profile_no_connected(self):
+        """=> Ensure error is thrown if the user is not connected (no authentication) """
+        with self.client:
+            response = self.client.get(
+                '/api/profile',
+                content_type='application/json',
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code, 403)
+            self.assertIn('error', data['status'])
