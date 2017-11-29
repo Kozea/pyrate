@@ -1,11 +1,18 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 from sqlalchemy import exc, or_
 
-from .. import bcrypt, db
+from .. import bcrypt, db, github
 from ..utils import authenticate
-from .models import User
+from .models import GHUser, NoAuthenticationMethod, NoEmailProvided, User
 
 auth_blueprint = Blueprint('auth', __name__)
+
+
+@github.access_token_getter
+def token_getter():
+    user = g.user
+    if user is not None:
+        return user.github_access_token
 
 
 @auth_blueprint.route('/auth/register', methods=['POST'])
@@ -43,7 +50,8 @@ def register_user():
             }
             return jsonify(response_object), 400
     # handler errors
-    except (exc.IntegrityError, ValueError) as e:
+    except (exc.IntegrityError, NoAuthenticationMethod, ValueError,
+            NoEmailProvided) as e:
         db.session.rollback()
         response_object = {'status': 'error', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
@@ -81,6 +89,46 @@ def login_user():
         db.session.rollback()
         response_object = {'status': 'error', 'message': 'Try again'}
         return jsonify(response_object), 500
+
+
+@auth_blueprint.route('/auth/gh-login', methods=('GET', 'POST'))
+def login_github_user():
+    print('login_github_user')
+    return github.authorize(scope="user")
+
+
+@auth_blueprint.route('/auth/callback')
+@github.authorized_handler
+def authorized(oauth_token):
+    if oauth_token is None:
+        response_object = {
+            'status': 'fail',
+            'message': 'Authorization failed.'
+        }
+        return jsonify(response_object), 400
+
+    user = User.query.filter_by(github_access_token=oauth_token).first()
+    if user is None:
+        ghuser = GHUser(oauth_token)
+        g.user = ghuser
+        user_profile = github.get('user')
+
+        user = User.query.filter_by(github_id=user_profile['id']).first()
+        if user is None:
+            user = User(
+                username=user_profile['login'],
+                email=None,
+                password=None,
+                github_access_token=oauth_token,
+                github_id=user_profile['id'])
+            db.session.add(user)
+            db.session.commit()
+
+    response_object = {
+        'status': 'success',
+        'message': 'Github login successful',
+    }
+    return jsonify(response_object), 200
 
 
 @auth_blueprint.route('/auth/logout', methods=['GET'])

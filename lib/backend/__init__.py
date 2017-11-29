@@ -5,6 +5,7 @@ import unittest
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
+from flask_github import GitHub
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -21,11 +22,15 @@ app = Flask(__name__)
 # set config
 with app.app_context():
     app.config.from_object('lib.backend.config.DevelopmentConfig')
+    # Set these values
+    app.config['GITHUB_CLIENT_ID'] = os.getenv('GH_ID', default=None)
+    app.config['GITHUB_CLIENT_SECRET'] = os.getenv('GH_SECRET', default=None)
 
 # set up extensions
 db.init_app(app)
 bcrypt.init_app(app)
 migrate.init_app(app, db)
+github = GitHub(app)
 
 from .corpus.corpus import corpus_blueprint  # noqa: E402
 from .corpus.models import Corpus_category, Corpus_text  # noqa: E402
