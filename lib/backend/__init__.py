@@ -82,7 +82,8 @@ def seed_db():
     db.session.add(User(
         username='admin',
         email='admin@example.com',
-        password='admin'
+        password='admin',
+        admin=True
     ))
     db.session.add(Corpus_category(
         label='Romans',

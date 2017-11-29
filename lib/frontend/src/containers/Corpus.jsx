@@ -12,22 +12,31 @@ class Corpus extends React.Component {
       categories: this.props.categories,
       corpusTexts: this.props.corpusTexts,
       message: this.props.message,
-      selectedCategory: '',
+      selectedCategory: {
+        id: null,
+        owner_id: null,
+      },
       user: this.props.user,
     }
   }
 
   componentWillReceiveProps(nextProps) {
     const selectedCategory = nextProps.categories[0]
-      ? nextProps.categories[0].id
-      : ''
+      ? {
+          id: nextProps.categories[0].id,
+          owner_id: nextProps.categories[0].owner_id,
+        }
+      : { id: null, owner_id: null }
 
     if (this.props.categories !== nextProps.categories) {
       this.setState({
         categories: nextProps.categories,
-        selectedCategory: selectedCategory,
+        selectedCategory: {
+          id: selectedCategory.id,
+          owner_id: selectedCategory.owner_id,
+        },
       })
-      this.props.actions.loadCorpusTexts(selectedCategory)
+      this.props.actions.loadCorpusTexts(selectedCategory.id)
     }
     if (this.props.corpusTexts !== nextProps.corpusTexts) {
       this.setState({ corpusTexts: nextProps.corpusTexts })
@@ -41,8 +50,13 @@ class Corpus extends React.Component {
   }
 
   handleCatChange(event) {
-    this.setState({ selectedCategory: event.target.value })
-    this.props.actions.loadCorpusTexts(event.target.value)
+    const catIdOwnedId = event.target.value.split('|')
+    const selectedCategory = {
+      id: parseInt(catIdOwnedId[0]),
+      owner_id: parseInt(catIdOwnedId[1]),
+    }
+    this.setState({ selectedCategory: selectedCategory })
+    this.props.actions.loadCorpusTexts(catIdOwnedId[0])
   }
 
   uploadFile(event) {
@@ -52,14 +66,14 @@ class Corpus extends React.Component {
     form.append(
       'data',
       `{"title": "${event.target.title.value}", "category_id": ${
-        this.state.selectedCategory
+        this.state.selectedCategory.id
       }}`
     )
-    this.props.actions.addCorpusTexts(form, this.state.selectedCategory)
+    this.props.actions.addCorpusTexts(form, this.state.selectedCategory.id)
   }
 
   deleteFile(textId) {
-    this.props.actions.deleteCorpusTexts(textId, this.state.selectedCategory)
+    this.props.actions.deleteCorpusTexts(textId, this.state.selectedCategory.id)
   }
 
   render() {
@@ -68,38 +82,51 @@ class Corpus extends React.Component {
         Liste des textes selon la catégorie du corpus :
         <select name="cat" onChange={event => this.handleCatChange(event)}>
           {this.state.categories.map(category => (
-            <option key={category.id} value={category.id}>
-              {category.label}
+            <option
+              key={category.id}
+              value={`${category.id}|${category.owner_id}`}
+            >
+              {category.label} ({category.owner_username})
             </option>
           ))}
         </select>
         <ul>
           {this.state.corpusTexts.map(text => (
             <li key={text.id}>
-              {text.title} (ajouté le {text.creation_date})
-              {this.state.user && (
-                <button type="submit" onClick={() => this.deleteFile(text.id)}>
-                  Supprimer
-                </button>
-              )}
+              {text.title} (ajouté le {text.creation_date}, par{' '}
+              {text.owner_username})
+              {this.state.user &&
+                (this.state.user.id === text.owner_id ||
+                  this.state.user.isAdmin) && (
+                  <div>
+                    <button
+                      type="submit"
+                      onClick={() => this.deleteFile(text.id)}
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                )}
             </li>
           ))}
         </ul>
-        {this.state.user && (
-          <div>
-            <br />
-            Ajouter un texte au corpus :
-            <form
-              encType="multipart/form-data"
-              onSubmit={event => this.uploadFile(event)}
-            >
-              <input name="title" placeholder="titre" required />
-              <input type="file" name="textFile" accept=".txt" required />
+        {this.state.user &&
+          (this.state.selectedCategory.owner_id === this.state.user.id ||
+            this.state.user.isAdmin) && (
+            <div>
               <br />
-              <button type="submit">Envoyer</button>
-            </form>
-          </div>
-        )}
+              Ajouter un texte au corpus :
+              <form
+                encType="multipart/form-data"
+                onSubmit={event => this.uploadFile(event)}
+              >
+                <input name="title" placeholder="titre" required />
+                <input type="file" name="textFile" accept=".txt" required />
+                <br />
+                <button type="submit">Envoyer</button>
+              </form>
+            </div>
+          )}
       </div>
     )
   }
@@ -128,6 +155,7 @@ Corpus.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       label: PropTypes.string.isRequired,
+      owner_id: PropTypes.number.isRequired,
     }).isRequired
   ).isRequired,
   corpusTexts: PropTypes.arrayOf(
@@ -135,11 +163,13 @@ Corpus.propTypes = {
       creation_date: PropTypes.string.isRequired,
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-      owner: PropTypes.number.isRequired,
+      owner_id: PropTypes.number.isRequired,
+      owner_username: PropTypes.string.isRequired,
     })
   ).isRequired,
   message: PropTypes.string.isRequired,
   user: PropTypes.shape({
+    id: PropTypes.number.isRequired,
     username: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     isAdmin: PropTypes.bool.isRequired,

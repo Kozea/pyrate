@@ -670,6 +670,37 @@ class TestCorpusService(BaseTestCase):
             self.assertTrue(data['message'] == f'Invalid payload.')
             self.assertEqual(response.status_code, 400)
 
+    def test_add_text_in_corpus_no_admin(self):
+        """=> Ensure error is thrown if user is not category ownmer or an admin."""
+        user = add_user('test', 'test@test.com', 'test')
+        add_category('romans', user.id)
+        add_user('another', 'another@another.com', 'another')
+
+        with self.client:
+            resp_login = self.client.post(
+                '/api/auth/login',
+                data=json.dumps(dict(email='another@another.com', password='another')),
+                content_type='application/json'
+            )
+            response = self.client.post(
+                '/api/corpus',
+                data=dict(
+                    file=(BytesIO(b'les miserables'), 'les_miserables.txt'),
+                    data='{"title": "les miserables", "category_id": 1}'
+                ),
+                headers=dict(
+                    content_type='multipart/form-data',
+                    authorization='Bearer ' +
+                    json.loads(resp_login.data.decode())['auth_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['status'] == 'error')
+            self.assertTrue(
+                data['message'] == 'You do not have permission to add a text in this category.'
+            )
+            self.assertEqual(response.status_code, 401)
+
     def test_get_text(self):
         """=> Ensure get all texts behaves correctly."""
         with self.client:
@@ -700,7 +731,7 @@ class TestCorpusService(BaseTestCase):
             print(data)
             self.assertEqual(response.status_code, 404)
             self.assertIn('fail', data['status'])
-            self.assertIn('Category does not exist.', data['message'])   
+            self.assertIn('Category does not exist.', data['message'])
 
     def test_delete_corpus(self):
         """=> Ensure delete a text from a corpus behaves correctly."""
@@ -790,7 +821,7 @@ class TestCorpusService(BaseTestCase):
             resp_login = self.client.post(
                 '/api/auth/login',
                 data=json.dumps(
-                    dict(email='another@another.com', password='another')
+                    dict(email='test@test.com', password='test')
                 ),
                 content_type='application/json'
             )
@@ -805,6 +836,13 @@ class TestCorpusService(BaseTestCase):
                     authorization='Bearer ' +
                     json.loads(resp_login.data.decode())['auth_token']
                 )
+            )
+            resp_login = self.client.post(
+                '/api/auth/login',
+                data=json.dumps(
+                    dict(email='another@another.com', password='another')
+                ),
+                content_type='application/json'
             )
             response = self.client.delete(
                 f'/api/corpus/1',
