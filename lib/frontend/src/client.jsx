@@ -2,7 +2,7 @@ import React from 'react'
 import { hydrate, render } from 'react-dom'
 import RedBox from 'redbox-react'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 
 import pyrateApp from './reducers'
@@ -10,7 +10,13 @@ import App from './components/App'
 import { loadCategories, loadAlgorithmes, isLogged } from './actions'
 import { debug } from './config'
 
-const store = createStore(pyrateApp, applyMiddleware(thunk))
+export const store = createStore(
+  pyrateApp,
+  window.__STATE__, // Server state
+  (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
+    applyMiddleware(thunk)
+  )
+)
 
 store.dispatch(loadCategories())
 store.dispatch(loadAlgorithmes())
@@ -25,7 +31,8 @@ export const renderRoot = handleError => {
       <Provider store={store}>
         <App />
       </Provider>,
-      rootNode)
+      rootNode
+    )
   } catch (error) {
     handleError(error)
   }

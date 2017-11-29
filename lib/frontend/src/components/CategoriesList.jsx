@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { deleteCategory, addCategory, editCat } from '../actions'
+import { deleteCategory, addCategory, editCat, updateCat } from '../actions'
 
-function CategoriesList({ categories, btnClick, addCat, showEdit, editClick }) {
+function CategoriesList({ categories, btnClick, addCat, editClick, updCat }) {
   let input
   return (
     <div>
@@ -11,10 +11,22 @@ function CategoriesList({ categories, btnClick, addCat, showEdit, editClick }) {
       <ul>
         {categories.map(category => (
           <li key={category.id}>
-            {showEdit ? (
+            {category.is_in_edition ? (
               <div>
-                <input value={category.label} />
-                <button type="submit">Valider</button>
+                <form
+                  onSubmit={e => {
+                    e.preventDefault()
+                    updCat(input.value)
+                  }}
+                >
+                  <input
+                    key={input}
+                    ref={node => {
+                      input = node
+                    }}
+                  />
+                  <button type="submit">Valider</button>
+                </form>
               </div>
             ) : (
               <div>
@@ -33,7 +45,7 @@ function CategoriesList({ categories, btnClick, addCat, showEdit, editClick }) {
             <button
               onClick={e => {
                 e.preventDefault()
-                editClick()
+                editClick(category.id)
               }}
             >
               Modifer
@@ -70,6 +82,7 @@ export default connect(
     return {
       btnClick: data => dispatch(deleteCategory(data)),
       addCat: data => dispatch(addCategory(data)),
+      updCat: data => dispatch(updateCat(data)),
       editClick: data => dispatch(editCat(data)),
     }
   }
