@@ -47,16 +47,15 @@ class Corpus extends React.Component {
 
   uploadFile(event) {
     event.preventDefault()
-
     const form = new FormData()
     form.append('file', event.target.textFile.files[0])
     form.append(
       'data',
-      `{"title": ${event.target.title.value}, "category_id": ${
+      `{"title": "${event.target.title.value}", "category_id": ${
         this.state.selectedCategory
       }}`
     )
-    this.props.actions.addCorpusTexts(form)
+    this.props.actions.addCorpusTexts(form, this.state.selectedCategory)
   }
 
   render() {
