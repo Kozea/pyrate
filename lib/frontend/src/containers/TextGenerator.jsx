@@ -124,7 +124,7 @@ TextGenerator.propTypes = {
       label: PropTypes.string.isRequired,
       training: PropTypes.shape({
         category_id: PropTypes.number.isRequired,
-        last_train: PropTypes.string.isRequired,
+        last_train: PropTypes.string,
       }),
     }).isRequired
   ).isRequired,
