@@ -36,6 +36,7 @@ def profile(user_id):
             response_object = {
                 'status': 'success',
                 'data': {
+                    'id': user.id,
                     'username': user.username,
                     'email': user.email,
                     'created_at': user.created_at,

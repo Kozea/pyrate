@@ -153,6 +153,7 @@ NavBar.propTypes = {
   actions: PropTypes.object.isRequired,
   message: PropTypes.string.isRequired,
   user: PropTypes.shape({
+    id: PropTypes.number.isRequired,
     username: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     isAdmin: PropTypes.bool.isRequired,
