@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { deleteCategory, addCategory, editCat, updateCat } from '../actions'
 
-function CategoriesList({ categories, btnClick, addCat, editClick, updCat }) {
+function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
   let input
   return (
     <div>
@@ -16,14 +16,16 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updCat }) {
                 <form
                   onSubmit={e => {
                     e.preventDefault()
-                    updCat(input.value)
+                    updClick(category.id, e.target.label.value)
                   }}
                 >
                   <input
+                    name="label"
                     key={input}
                     ref={node => {
                       input = node
                     }}
+                    defaultValue={category.label}
                   />
                   <button type="submit">Valider</button>
                 </form>
@@ -82,7 +84,7 @@ export default connect(
     return {
       btnClick: data => dispatch(deleteCategory(data)),
       addCat: data => dispatch(addCategory(data)),
-      updCat: data => dispatch(updateCat(data)),
+      updClick: (id, data) => dispatch(updateCat(id, data)),
       editClick: data => dispatch(editCat(data)),
     }
   }
