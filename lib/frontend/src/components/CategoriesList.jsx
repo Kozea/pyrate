@@ -77,7 +77,6 @@ export default connect(
   function mapStateToProps(state) {
     return {
       categories: state.categories,
-      showEdit: state.showEdit,
     }
   },
   function mapDispatchToProps(dispatch) {

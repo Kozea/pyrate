@@ -69,7 +69,7 @@ class TextGenerator extends React.Component {
     return (
       <div>
         <form onSubmit={event => this.formPreventDefault(event)}>
-          Algorithmes displonibles :
+          Algorithmes disponibles :
           <select name="algo" onChange={event => this.handleAlgoChange(event)}>
             {this.state.algorithmes.map(algorithm => (
               <option key={algorithm.id} value={algorithm.label}>
