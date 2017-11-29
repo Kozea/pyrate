@@ -76,6 +76,13 @@ class Corpus extends React.Component {
     this.props.actions.deleteCorpusTexts(textId, this.state.selectedCategory.id)
   }
 
+  canDisplay() {
+    return (
+      this.state.selectedCategory.owner_id === this.state.user.id ||
+      this.state.user.isAdmin
+    )
+  }
+
   render() {
     return (
       <div>
@@ -96,8 +103,7 @@ class Corpus extends React.Component {
               {text.title} (ajouté le {text.creation_date}, par{' '}
               {text.owner_username})
               {this.state.user &&
-                (this.state.user.id === text.owner_id ||
-                  this.state.user.isAdmin) && (
+                this.canDisplay() && (
                   <div>
                     <button
                       type="submit"
@@ -111,8 +117,7 @@ class Corpus extends React.Component {
           ))}
         </ul>
         {this.state.user &&
-          (this.state.selectedCategory.owner_id === this.state.user.id ||
-            this.state.user.isAdmin) && (
+          this.canDisplay() && (
             <div>
               <br />
               Ajouter un texte au corpus :
