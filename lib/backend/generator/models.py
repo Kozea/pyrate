@@ -88,7 +88,7 @@ class MarkovifyAlgo(TextGenerationStragegy):
         text = ""
         try:
             for corpus_text in corpus_texts:
-                with open(corpus_text) as f:
+                with open(corpus_text, encoding='utf-8') as f:
                     text = text + "\n\n" + f.read()
 
             # Build the model

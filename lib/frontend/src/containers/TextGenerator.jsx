@@ -91,10 +91,11 @@ class TextGenerator extends React.Component {
           <button onClick={event => this.runGenText(event, 'generate')}>
             Generate
           </button>
+          <br />
           <textarea
             name="message"
-            rows="10"
-            cols="30"
+            rows="15"
+            cols="100"
             value={this.state.text}
           />
         </form>
