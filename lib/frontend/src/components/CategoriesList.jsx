@@ -3,7 +3,14 @@ import { connect } from 'react-redux'
 
 import { deleteCategory, addCategory, editCat, updateCat } from '../actions'
 
-function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
+function CategoriesList({
+  // user,
+  categories,
+  btnClick,
+  addCat,
+  editClick,
+  updClick,
+}) {
   let input
   return (
     <div>
@@ -34,6 +41,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
             ) : (
               <div>
                 {category.label}
+                {/* {user.isLoggedUser === true && ( */}
                 <button
                   onClick={e => {
                     e.preventDefault()
@@ -42,6 +50,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
                 >
                   Supprimer
                 </button>
+                {/* )} */}
               </div>
             )}
 
@@ -56,6 +65,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
           </li>
         ))}
       </ul>
+      {/* <p>{message}</p> */}
       <form
         onSubmit={e => {
           e.preventDefault()
@@ -79,6 +89,7 @@ export default connect(
   function mapStateToProps(state) {
     return {
       categories: state.categories,
+      user: state.user,
     }
   },
   function mapDispatchToProps(dispatch) {
