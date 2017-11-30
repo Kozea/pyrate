@@ -40,6 +40,7 @@ setup(
         'Flask-Script == 2.0.5',
         'Flask-SQLAlchemy == 2.3.2',
         'Flask-Testing == 0.6.2',
+        'GitHub-Flask == 3.2.0',
         'itsdangerous == 0.24',
         'Jinja2 == 2.10',
         'Mako == 1.0.7',

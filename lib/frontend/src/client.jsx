@@ -7,7 +7,12 @@ import thunk from 'redux-thunk'
 
 import pyrateApp from './reducers'
 import App from './components/App'
-import { loadCategories, loadAlgorithmes, loadProfile } from './actions'
+import {
+  loadCategories,
+  loadAlgorithmes,
+  loadProfile,
+  githubCallback,
+} from './actions'
 import { debug } from './config'
 
 export const store = createStore(
@@ -25,6 +30,10 @@ store.dispatch(loadProfile())
 export const rootNode = document.getElementById('root')
 
 export const renderRoot = handleError => {
+  if (location.pathname.match(/gh-callback/g) !== null) {
+    store.dispatch(githubCallback(location.search))
+    history.replaceState(null, '', '/')
+  }
   try {
     const renderMode = debug ? render : hydrate
     renderMode(
