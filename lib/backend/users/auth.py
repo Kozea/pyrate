@@ -105,6 +105,7 @@ def login_github_user():
         response_object = {'status': 'error', 'message': 'Try again'}
         return jsonify(response_object), 500
 
+
 @auth_blueprint.route('/auth/callback')
 @github.authorized_handler
 def authorized(oauth_token):

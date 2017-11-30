@@ -165,7 +165,7 @@ NavBar.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.number.isRequired,
     username: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    email: PropTypes.string,
     isAdmin: PropTypes.bool.isRequired,
     createdAt: PropTypes.string.isRequired,
   }),
