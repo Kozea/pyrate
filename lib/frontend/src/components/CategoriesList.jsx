@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { deleteCategory, addCategory, editCat, updateCat } from '../actions'
 
 function CategoriesList({
-  // user,
+  user,
   categories,
   btnClick,
   addCat,
@@ -41,46 +41,48 @@ function CategoriesList({
             ) : (
               <div>
                 {category.label}
-                {/* {user.isLoggedUser === true && ( */}
-                <button
-                  onClick={e => {
-                    e.preventDefault()
-                    btnClick(category.id)
-                  }}
-                >
-                  Supprimer
-                </button>
-                {/* )} */}
+                {user !== null && (
+                  <button
+                    onClick={e => {
+                      e.preventDefault()
+                      btnClick(category.id)
+                    }}
+                  >
+                    Supprimer
+                  </button>
+                )}
               </div>
             )}
-
-            <button
-              onClick={e => {
-                e.preventDefault()
-                editClick(category.id)
-              }}
-            >
-              {category.is_in_edition ? 'Annuler' : 'Modifier'}
-            </button>
+            {user !== null && (
+              <button
+                onClick={e => {
+                  e.preventDefault()
+                  editClick(category.id)
+                }}
+              >
+                {category.is_in_edition ? 'Annuler' : 'Modifier'}
+              </button>
+            )}
           </li>
         ))}
       </ul>
-      {/* <p>{message}</p> */}
-      <form
-        onSubmit={e => {
-          e.preventDefault()
-          addCat(input.value)
-        }}
-      >
-        <input
-          required
-          key={input}
-          ref={node => {
-            input = node
+      {user !== null && (
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            addCat(input.value)
           }}
-        />
-        <button type="submit">Ajouter une catégorie</button>
-      </form>
+        >
+          <input
+            required
+            key={input}
+            ref={node => {
+              input = node
+            }}
+          />
+          <button type="submit">Ajouter une catégorie</button>
+        </form>
+      )}
     </div>
   )
 }
