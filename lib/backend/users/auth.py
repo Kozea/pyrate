@@ -1,7 +1,7 @@
 from flask import Blueprint, g, jsonify, request
 from sqlalchemy import exc, or_
 
-from .. import bcrypt, db, github
+from .. import app, bcrypt, db, github
 from ..utils import authenticate
 from .models import GHUser, NoAuthenticationMethod, NoEmailProvided, User
 
@@ -93,6 +93,17 @@ def login_user():
 
 @auth_blueprint.route('/auth/gh-login', methods=('GET', 'POST'))
 def login_github_user():
+
+    if (app.config['GITHUB_CLIENT_ID'] == '' or
+       app.config['GITHUB_CLIENT_ID'] == None or
+       app.config['GITHUB_CLIENT_SECRET'] == '' or
+       app.config['GITHUB_CLIENT_SECRET'] == None):
+        response_object = {
+            'status': 'error',
+            'message': 'Github configuration missing'
+        }
+        return jsonify(response_object), 500
+
     response = github.authorize(scope="user")
     if response.status_code == 302:
         response_object = {
