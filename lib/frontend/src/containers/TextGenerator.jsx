@@ -3,7 +3,12 @@ import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { train, generateText } from '../actions'
+import {
+  train,
+  generateText,
+  trainInProgress,
+  generationInProgress,
+} from '../actions'
 
 class TextGenerator extends React.Component {
   constructor(props, context) {
@@ -58,9 +63,11 @@ class TextGenerator extends React.Component {
     const catId = parseInt(this.state.selectedCategory)
     switch (type) {
       case 'generate':
+        this.props.actions.generationInProgress()
         this.props.actions.generateText(this.state.selectedAlgo, catId)
         break
       default:
+        this.props.actions.trainInProgress()
         this.props.actions.train(this.state.selectedAlgo, catId)
     }
   }
@@ -113,7 +120,10 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ train, generateText }, dispatch),
+    actions: bindActionCreators(
+      { train, generateText, trainInProgress, generationInProgress },
+      dispatch
+    ),
   }
 }
 

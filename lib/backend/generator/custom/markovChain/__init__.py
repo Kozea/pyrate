@@ -2,8 +2,9 @@ import glob  # Used by bulk_train()
 import pickle  # Used for (de)serialization of the tree
 import random
 import re
+from functools import reduce
 
-from ... import appLog
+from .... import appLog
 
 
 class MarkovChain:
@@ -186,3 +187,61 @@ class MarkovChain:
             # -2 because the actual last character is either a space or a
             # newline.
             lc = wstr[-2]
+
+    def adjust_weights(self, max_len=2, f=lambda a, b: 0):
+        '''
+        Adjusts the relationships between branch and leaf according to a
+        fitness function f.
+        '''
+        # Generate a number of words stochastically
+        pairs = [w.lower() for w in self.generate(max_len=max_len,
+                 rand=lambda r: random.random() * r)]
+        # Create the pairs a,b b,c, c,d ...
+        pairs = [[pairs[i], None if i == len(pairs) - 1
+                 else pairs[i + 1]]
+                 for i in range(len(pairs))][:-1]
+        # Get the fitness for each pair, and convert it from the 0,1 range
+        # to the -1,1 range.
+        factors = [(f(*p) - 0.5) * 2 for p in pairs]
+        # Train the model on the pair p by a factor x
+        for p, x in zip(pairs, factors):
+            if x < -1 or x > 1:
+                raise ValueError(x)
+            self.train(reduce(lambda a, b: '{0} {1}'.format(a, b), p), x)
+
+    def bulk_adjust_weights(self, fitness_functions=None, iterations=1,
+                            pbar_len=14, verbose=False):
+        '''
+        Calls adjust_weights with the multiplied result of multiple fitness
+        functions, for a given number of iterations.
+        If verbose==True, shows a neat progress bar.
+        '''
+        # Used to flush stdout to properly show the progress bar
+        import sys
+
+        if fitness_functions is None or len(fitness_functions) == 0:
+            return
+
+        if verbose:
+            print('Beginning training with {0} algorithms.'.format(
+                   len(fitness_functions)))
+
+        for i in range(iterations):
+            self.adjust_weights(f=lambda a,
+                                b: reduce(lambda x,
+                                          y: x * y,
+                                          [ff(a, b)
+                                           for ff in fitness_functions]))
+            if verbose and i % (iterations // pbar_len + 1) == 0:
+                progress = i / iterations
+                pbar_full = int(progress * pbar_len)
+                pbar_empty = pbar_len - pbar_full
+
+                print('\r[{0}{1}] - {2:.2f}%'
+                      .format('=' * pbar_full, '-' * pbar_empty,
+                              progress * 100), end='')
+                sys.stdout.flush()
+
+        if verbose:
+            print('\r[{0}] - {1:.2f}%'.format('=' * pbar_len, 100))
+            print('Training complete.')

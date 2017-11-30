@@ -5,6 +5,9 @@ import markovify
 from .. import app, appLog, db
 from ..corpus.models import Corpus_category
 from .custom.markovChain import MarkovChain
+from .custom.markovChain.training_algorithms import (
+    aw_favor_complexity, aw_favor_consonants, aw_favor_punctuation, aw_mul
+)
 
 
 class Training(db.Model):
@@ -161,6 +164,12 @@ class MarkovChainAlgo(TextGenerationStragegy):
                                       "MarkovChain_cat-{}.model"
                                       .format(category_id)
                                       )
+            mkv.bulk_adjust_weights(
+                fitness_functions=[aw_mul(aw_favor_complexity, 1/3),
+                                   aw_mul(aw_favor_punctuation, 1/2),
+                                   aw_mul(aw_favor_consonants, 1/2)],
+                iterations=10000,
+                verbose=True)
             mkv.save_training(model_file)
             return True
         except Exception as e:
