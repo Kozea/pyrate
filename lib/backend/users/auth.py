@@ -93,9 +93,17 @@ def login_user():
 
 @auth_blueprint.route('/auth/gh-login', methods=('GET', 'POST'))
 def login_github_user():
-    print('login_github_user')
-    return github.authorize(scope="user")
-
+    response = github.authorize(scope="user")
+    if response.status_code == 302:
+        response_object = {
+            'status': 'success',
+            'message': 'redirection to github',
+            'url': response.headers.get('location')
+        }
+        return jsonify(response_object), 200
+    else:
+        response_object = {'status': 'error', 'message': 'Try again'}
+        return jsonify(response_object), 500
 
 @auth_blueprint.route('/auth/callback')
 @github.authorized_handler
@@ -124,9 +132,12 @@ def authorized(oauth_token):
             db.session.add(user)
             db.session.commit()
 
+    # generate pyrate auth token
+    auth_token = user.encode_auth_token(user.id)
     response_object = {
         'status': 'success',
-        'message': 'Github login successful',
+        'message': 'Successfully logged in.',
+        'auth_token': auth_token.decode()
     }
     return jsonify(response_object), 200
 
