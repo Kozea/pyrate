@@ -37,7 +37,7 @@ def add_all():
     filename = 'les_miserables_markov.txt'
     dirpath = os.path.join(app.root_path, 'tests/files')
     filepath = os.path.join(dirpath, filename)
-    txt = add_corpus_text('les_miserables_markov',
-                          filepath,
-                          cat.id,
-                          user.id)
+    add_corpus_text('les_miserables_markov',
+                    filepath,
+                    cat.id,
+                    user.id)
