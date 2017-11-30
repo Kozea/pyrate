@@ -6,7 +6,7 @@ from base import BaseTestCase
 from utils import add_all, add_category, add_user
 
 from lib.backend import db
-from lib.backend.generator.models import TextGeneration, MarkovifyAlgo, MarkovChainAlgo, Training, Algorithm
+from lib.backend.generator.models import Training, Algorithm
 
 
 @ddt
@@ -171,8 +171,8 @@ class TestGeneratorService(BaseTestCase):
                pre-trained models.
         """
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('test', user.id)
-        cat = add_category('romans', user.id)  # to be sure no file exists
+        add_category('test', user.id)
+        add_category('romans', user.id)  # to be sure no file exists
 
         with self.client:
             response = self.client.post(
@@ -196,8 +196,8 @@ class TestGeneratorService(BaseTestCase):
             => Ensure error is thrown if the model is not trained.
         """
         user = add_user('test', 'test@test.com', 'test')
-        cat = add_category('test', user.id)
-        cat = add_category('romans', user.id)  # to be sure no file exists
+        add_category('test', user.id)
+        add_category('romans', user.id)  # to be sure no file exists
 
         with self.client:
             response = self.client.post(

@@ -1,7 +1,7 @@
 from flask import Blueprint, g, jsonify, request
 from sqlalchemy import exc, or_
 
-from .. import app, bcrypt, db, github
+from .. import app, appLog, bcrypt, db, github
 from ..utils import authenticate
 from .models import GHUser, NoAuthenticationMethod, NoEmailProvided, User
 
@@ -52,6 +52,7 @@ def register_user():
     # handler errors
     except (exc.IntegrityError, NoAuthenticationMethod, ValueError,
             NoEmailProvided) as e:
+        appLog.error(e)
         db.session.rollback()
         response_object = {'status': 'error', 'message': 'Invalid payload.'}
         return jsonify(response_object), 400
@@ -86,6 +87,7 @@ def login_user():
             return jsonify(response_object), 404
     # handler errors
     except (exc.IntegrityError, ValueError) as e:
+        appLog.error(e)
         db.session.rollback()
         response_object = {'status': 'error', 'message': 'Try again'}
         return jsonify(response_object), 500

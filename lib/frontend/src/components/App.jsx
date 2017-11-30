@@ -13,7 +13,6 @@ export default function App() {
       <hr />
       <TextGenerator />
       <hr />
-      <hr />
       <DisplayCatList />
       <AddCategory />
       <hr />
