@@ -31,6 +31,7 @@ export const rootNode = document.getElementById('root')
 export const renderRoot = handleError => {
   if (location.pathname.match(/gh-callback/g) !== null) {
     store.dispatch(githubCallback(location.search))
+    history.replaceState(null, '', '/')
   }
   try {
     const renderMode = debug ? render : hydrate
