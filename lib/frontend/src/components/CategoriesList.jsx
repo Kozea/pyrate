@@ -20,6 +20,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
                   }}
                 >
                   <input
+                    required
                     name="label"
                     key={input}
                     ref={node => {
@@ -50,7 +51,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
                 editClick(category.id)
               }}
             >
-              Modifer
+              {category.is_in_edition ? 'Annuler' : 'Modifier'}
             </button>
           </li>
         ))}
@@ -62,6 +63,7 @@ function CategoriesList({ categories, btnClick, addCat, editClick, updClick }) {
         }}
       >
         <input
+          required
           key={input}
           ref={node => {
             input = node

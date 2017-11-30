@@ -2,7 +2,7 @@ import React from 'react'
 
 // import AddCategory from '../containers/AddCategory'
 import Corpus from '../containers/Corpus'
-import DisplayCatList from '../containers/DisplayCategories'
+import CategoriesList from '../components/CategoriesList'
 import NavBar from '../containers/NavBar'
 import TextGenerator from '../containers/TextGenerator'
 
@@ -14,7 +14,7 @@ export default function App() {
       <TextGenerator />
       <hr />
       <hr />
-      <DisplayCatList />
+      <CategoriesList />
       <hr />
       <Corpus />
     </div>
