@@ -2,15 +2,25 @@ import React from 'react'
 import { hydrate, render } from 'react-dom'
 import RedBox from 'redbox-react'
 import { Provider } from 'react-redux'
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 
 import pyrateApp from './reducers'
 import App from './components/App'
-import { loadCategories, loadAlgorithmes, loadProfile } from './actions'
+import {
+  loadCategories,
+  loadAlgorithmes,
+  loadProfile,
+  githubCallback,
+} from './actions'
 import { debug } from './config'
 
-const store = createStore(pyrateApp, applyMiddleware(thunk))
+const store = createStore(
+  pyrateApp,
+  (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
+    applyMiddleware(thunk)
+  )
+)
 
 store.dispatch(loadCategories())
 store.dispatch(loadAlgorithmes())
@@ -19,6 +29,10 @@ store.dispatch(loadProfile())
 export const rootNode = document.getElementById('root')
 
 export const renderRoot = handleError => {
+  if (location.pathname.match(/gh-callback/g) !== null) {
+    store.dispatch(githubCallback(location.search))
+    history.replaceState(null, '', '/')
+  }
   try {
     const renderMode = debug ? render : hydrate
     renderMode(

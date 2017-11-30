@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { login, logout, register } from '../actions'
+import { login, logout, register, githubLogin } from '../actions'
 
 class NavBar extends React.Component {
   constructor(props, context) {
@@ -79,6 +79,10 @@ class NavBar extends React.Component {
     this.setState({ currentAction: 'init' })
   }
 
+  githubLogin() {
+    this.props.actions.githubLogin()
+  }
+
   render() {
     return (
       <div>
@@ -91,6 +95,9 @@ class NavBar extends React.Component {
             </button>
             <button onClick={event => this.displayForm(event, 'register')}>
               Register
+            </button>{' '}
+            <button onClick={event => this.githubLogin(event, 'register')}>
+              Log with GitHub
             </button>
           </div>
         )}
@@ -145,7 +152,10 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ login, logout, register }, dispatch),
+    actions: bindActionCreators(
+      { login, logout, register, githubLogin },
+      dispatch
+    ),
   }
 }
 
@@ -155,7 +165,7 @@ NavBar.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.number.isRequired,
     username: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
+    email: PropTypes.string,
     isAdmin: PropTypes.bool.isRequired,
     createdAt: PropTypes.string.isRequired,
   }),
