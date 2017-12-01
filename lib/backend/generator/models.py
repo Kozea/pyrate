@@ -173,7 +173,7 @@ class MarkovChainAlgo(TextGenerationStragegy):
                                    aw_mul(aw_favor_punctuation, 1/2),
                                    aw_mul(aw_favor_consonants, 1/2)],
                 iterations=10000,
-                verbose=True)
+                verbose=False)
             mkv.save_training(model_file)
             return True
         except Exception as e:

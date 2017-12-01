@@ -23,7 +23,7 @@ class MarkovChain:
         # and remove empty entries. This keeps punctuation at the
         # end of words containing it. If you do not care about
         # punctuation, include it in the split regex.
-        words = filter(lambda s: len(s) > 0, re.split(r'[\s]', text))
+        words = filter(lambda s: len(s) > 0, re.split(r'[\s"]', text))
         # Casing is not as important as punctuation.
         words = [w.lower() for w in words]
         # "For each pair of words contained within the corpus:"
@@ -41,8 +41,7 @@ class MarkovChain:
         '''
         Trains the generator on a single file.
         '''
-        encodings = encodings if encodings is not None else ['utf-8',
-                                                             'ISO-8859-1']
+        encodings = encodings if encodings is not None else ['utf-8']
         ret = False
         # If your input files have mismatching encoding, try a few, good ones.
         # If all fails, report back.
@@ -129,7 +128,8 @@ class MarkovChain:
 
             # Otherwise, randomize against the weight of each leaf word divided
             # by the number of leaves.
-            dist = sorted([(w, rand(self.tree[word][w] / len(self.tree[word])))
+            dist = sorted([(w, rand(self.tree[word][w] //
+                          len(self.tree[word])))
                           for w in self.tree[word]],
                           # And sort the result in decreasing order.
                           key=lambda k: 1-k[1])
