@@ -72,6 +72,7 @@ class TextGenerator extends React.Component {
       AlgoParamValue: algo[2],
       text: '',
     })
+    document.getElementById('param').value = null
   }
   handleCatChange(event) {
     this.setState({ selectedCategory: event.target.value, text: '' })
@@ -142,6 +143,7 @@ class TextGenerator extends React.Component {
           <br />
           Nombre de {this.state.AlgoParam} :
           <input
+            id="param"
             name="param"
             placeholder={this.state.AlgoParamValue}
             onChange={event => this.handleParamChange(event)}

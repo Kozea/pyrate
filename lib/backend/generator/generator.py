@@ -154,7 +154,8 @@ def generate_text():
     if not result:
         response_object = {
             'status': 'fail',
-            'message': 'No result, maybe the model must be re-trained.'
+            'message': 'No result, maybe the model must be re-trained and\or'
+                       ' the corpus must be adjusted.'
         }
         return jsonify(response_object), 400
 

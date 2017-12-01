@@ -244,5 +244,5 @@ class TestGeneratorService(BaseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertIn('fail', data['status'])
-            self.assertIn('No result, maybe the model must be re-trained.',
+            self.assertIn('No result, maybe the model must be re-trained and\or the corpus must be adjusted.',
                           data['message'])
