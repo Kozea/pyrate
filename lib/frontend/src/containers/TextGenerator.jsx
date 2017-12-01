@@ -19,6 +19,7 @@ class TextGenerator extends React.Component {
       text: this.props.generatedText,
       selectedAlgo: '',
       selectedCategory: '',
+      isDisabled: false,
     }
   }
 
@@ -41,6 +42,12 @@ class TextGenerator extends React.Component {
         categories: nextProps.categories,
         selectedCategory: selectedCategory,
       })
+    }
+
+    if (nextProps.text.match(/Please wait/g)) {
+      this.setState({ isDisabled: true })
+    } else {
+      this.setState({ isDisabled: false })
     }
     if (this.props.text !== nextProps.text) {
       this.setState({ text: nextProps.text })
@@ -92,10 +99,16 @@ class TextGenerator extends React.Component {
               </option>
             ))}
           </select>
-          <button onClick={event => this.runGenText(event, 'train')}>
+          <button
+            onClick={event => this.runGenText(event, 'train')}
+            disabled={this.state.isDisabled}
+          >
             Train
           </button>
-          <button onClick={event => this.runGenText(event, 'generate')}>
+          <button
+            onClick={event => this.runGenText(event, 'generate')}
+            disabled={this.state.isDisabled}
+          >
             Generate
           </button>
           <br />

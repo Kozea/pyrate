@@ -70,6 +70,7 @@ class Corpus extends React.Component {
       }}`
     )
     this.props.actions.addCorpusTexts(form, this.state.selectedCategory.id)
+    event.target.reset()
   }
 
   deleteFile(textId) {
