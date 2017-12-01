@@ -26,7 +26,7 @@ class TestGeneratorMarkovify(BaseTestCase):
         """=> Ensure text generation is ok"""
         add_all()
         text_generator = TextGeneration(MarkovifyAlgo())
-        result = text_generator.generateText(1)
+        result = text_generator.generateText(1, 5)
         self.assertIsNotNone(result)
 
 
@@ -47,6 +47,6 @@ class TestGeneratorMarkovChain(BaseTestCase):
         """=> Ensure text generation is ok"""
         add_all()
         text_generator = TextGeneration(MarkovChainAlgo())
-        result = text_generator.generateText(1)
+        result = text_generator.generateText(1, 50)
 
         self.assertIsNotNone(result)

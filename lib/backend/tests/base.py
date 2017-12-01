@@ -11,10 +11,14 @@ class BaseTestCase(TestCase):
     def setUp(self):
         db.create_all()
         db.session.add(Algorithm(
-            label='markovify'
+            label='markovify',
+            default_param='phrases',
+            default_param_value=5
         ))
         db.session.add(Algorithm(
-            label='MarkovChain'
+            label='MarkovChain',
+            default_param='mots',
+            default_param_value=50
         ))
         db.session.commit()
 

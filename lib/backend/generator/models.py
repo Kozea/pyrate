@@ -29,14 +29,18 @@ class Algorithm(db.Model):
     __tablename__ = "algorithms"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     label = db.Column(db.String(80), unique=True, nullable=False)
+    default_param = db.Column(db.String(80), nullable=False)
+    default_param_value = db.Column(db.Integer, nullable=False)
     trainings = db.relationship('Training', backref='algorithm',
                                 primaryjoin=id == Training.algorithm_id)
 
     def __repr__(self):
         return '<Text generation algorithm %r>' % self.label
 
-    def __init__(self, label):
+    def __init__(self, label, default_param, default_param_value):
         self.label = label
+        self.default_param = default_param
+        self.default_param_value = default_param_value
 
     def is_trained(self, cat_id):
         # TODO: METHOD TO CHECK
@@ -64,8 +68,8 @@ class TextGeneration(object):
         self.train = self.strategy.train(category_id)
         return self.train
 
-    def generateText(self, category_id):
-        self.generated_text = self.strategy.generateText(category_id)
+    def generateText(self, category_id, length):
+        self.generated_text = self.strategy.generateText(category_id, length)
         return self.generated_text
 
 
@@ -73,7 +77,7 @@ class TextGenerationStragegy(object):
     def train(self, category_id):
         raise NotImplementedError
 
-    def generateText(self, category_id):
+    def generateText(self, category_id, length):
         raise NotImplementedError
 
 
@@ -113,7 +117,7 @@ class MarkovifyAlgo(TextGenerationStragegy):
             appLog.error(e)
             return False
 
-    def generateText(self, category_id, nb_sentences=5):
+    def generateText(self, category_id, length):
         result = ""
 
         try:
@@ -127,7 +131,7 @@ class MarkovifyAlgo(TextGenerationStragegy):
                 model_json = f.read()
             text_model = markovify.Text.from_json(model_json)
             # Print five randomly-generated sentences
-            for i in range(nb_sentences):
+            for i in range(length):
                 result = result + (text_model.make_sentence()) + "\n\n"
             return result
         except Exception as e:
@@ -140,11 +144,11 @@ class MarkovChainAlgo(TextGenerationStragegy):
     def __init__(self):
         self.name = "MarkovChain"
 
-    def gen(self, m):
+    def gen(self, m, words_nb):
         return ''.join([w for w in m.generate_formatted(word_wrap=60,
                                                         soft_wrap=True,
                                                         start_with=None,
-                                                        max_len=50,
+                                                        max_len=words_nb,
                                                         verbose=True)])
 
     def train(self, category_id):
@@ -176,7 +180,7 @@ class MarkovChainAlgo(TextGenerationStragegy):
             appLog.error(e)
             return False
 
-    def generateText(self, category_id):
+    def generateText(self, category_id, length):
         mkv = MarkovChain()
 
         try:
@@ -187,7 +191,7 @@ class MarkovChainAlgo(TextGenerationStragegy):
                                       )
             mkv.load_training(model_file)
 
-            return self.gen(mkv)
+            return self.gen(mkv, length)
         except Exception as e:
             appLog.error(e)
             return None
