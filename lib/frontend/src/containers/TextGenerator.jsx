@@ -18,6 +18,8 @@ class TextGenerator extends React.Component {
       categories: this.props.categories,
       text: this.props.generatedText,
       selectedAlgo: '',
+      AlgoParam: '',
+      AlgoParamValue: 0,
       selectedCategory: '',
       isDisabled: false,
     }
@@ -27,6 +29,12 @@ class TextGenerator extends React.Component {
     const selectedAlgo = nextProps.algorithmes[0]
       ? nextProps.algorithmes[0].label
       : ''
+    const AlgoParam = nextProps.algorithmes[0]
+      ? nextProps.algorithmes[0].default_param
+      : ''
+    const AlgoParamValue = nextProps.algorithmes[0]
+      ? nextProps.algorithmes[0].default_param_value
+      : ''
     const selectedCategory = nextProps.categories[0]
       ? nextProps.categories[0].id
       : ''
@@ -35,6 +43,8 @@ class TextGenerator extends React.Component {
       this.setState({
         algorithmes: nextProps.algorithmes,
         selectedAlgo: selectedAlgo,
+        AlgoParam: AlgoParam,
+        AlgoParamValue: AlgoParamValue,
       })
     }
     if (this.props.categories !== nextProps.categories) {
@@ -55,10 +65,19 @@ class TextGenerator extends React.Component {
   }
 
   handleAlgoChange(event) {
-    this.setState({ selectedAlgo: event.target.value, text: '' })
+    const algo = event.target.value.split('|')
+    this.setState({
+      selectedAlgo: algo[0],
+      AlgoParam: algo[1],
+      AlgoParamValue: algo[2],
+      text: '',
+    })
   }
   handleCatChange(event) {
     this.setState({ selectedCategory: event.target.value, text: '' })
+  }
+  handleParamChange(event) {
+    this.setState({ AlgoParamValue: event.target.value, text: '' })
   }
 
   formPreventDefault(event) {
@@ -71,7 +90,11 @@ class TextGenerator extends React.Component {
     switch (type) {
       case 'generate':
         this.props.actions.generationInProgress()
-        this.props.actions.generateText(this.state.selectedAlgo, catId)
+        this.props.actions.generateText(
+          this.state.selectedAlgo,
+          catId,
+          this.state.AlgoParamValue
+        )
         break
       default:
         this.props.actions.trainInProgress()
@@ -83,10 +106,15 @@ class TextGenerator extends React.Component {
     return (
       <div>
         <form onSubmit={event => this.formPreventDefault(event)}>
-          Algorithmes displonibles :
+          Algorithmes disponibles :
           <select name="algo" onChange={event => this.handleAlgoChange(event)}>
             {this.state.algorithmes.map(algorithm => (
-              <option key={algorithm.id} value={algorithm.label}>
+              <option
+                key={algorithm.id}
+                value={`${algorithm.label}|${algorithm.default_param}|${
+                  algorithm.default_param_value
+                }`}
+              >
                 {algorithm.label}
               </option>
             ))}
@@ -111,6 +139,13 @@ class TextGenerator extends React.Component {
           >
             Generate
           </button>
+          <br />
+          Nombre de {this.state.AlgoParam} :
+          <input
+            name="param"
+            placeholder={this.state.AlgoParamValue}
+            onChange={event => this.handleParamChange(event)}
+          />
           <br />
           <textarea
             name="message"
@@ -146,6 +181,8 @@ TextGenerator.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       label: PropTypes.string.isRequired,
+      default_param: PropTypes.string.isRequired,
+      default_param_value: PropTypes.number.isRequired,
       training: PropTypes.shape({
         category_id: PropTypes.number.isRequired,
         last_train: PropTypes.string,

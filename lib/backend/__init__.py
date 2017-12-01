@@ -79,10 +79,14 @@ def recreate_db():
 def seed_db():
     """Seeds the database."""
     db.session.add(Algorithm(
-        label='markovify'
+        label='markovify',
+        default_param='phrases',
+        default_param_value=5
         ))
     db.session.add(Algorithm(
-        label='MarkovChain'
+        label='MarkovChain',
+        default_param='mots',
+        default_param_value=50
         ))
     admin = User(username='admin', email='admin@example.com', password='admin')
     admin.admin = True

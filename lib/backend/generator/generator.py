@@ -15,12 +15,12 @@ def verify_payload(request):
     response_object = {'status': 'fail', 'message': 'Invalid payload.'}
     post_data = request.get_json()
     if not post_data:
-        return response_object, None, None
+        return response_object, None, None, None
     algo_name = post_data.get('algo')
     category_id = post_data.get('category_id')
 
     if algo_name is None or category_id is None:
-        return response_object, None, None
+        return response_object, None, None, None
 
     algo = Algorithm.query.filter_by(label=algo_name).first()
     if not algo:
@@ -28,7 +28,11 @@ def verify_payload(request):
             'status': 'error',
             'message': 'Selected algorithm does not exist.'
         }
-        return response_object, None, None
+        return response_object, None, None, None
+
+    length = post_data.get('length')
+    if not length:
+        length = algo.default_param_value
 
     category = Corpus_category.query.filter_by(id=category_id).first()
     if not category:
@@ -36,8 +40,8 @@ def verify_payload(request):
             'status': 'error',
             'message': 'Selected category does not exist.'
         }
-        return response_object, None, None
-    return None, algo, category_id
+        return response_object, None, None, None
+    return None, algo, category_id, length
 
 
 @generator_blueprint.route('/algorithmes', methods=['GET'])
@@ -56,6 +60,8 @@ def get_algorithm():
             algo_object = {
                 'id': algo.id,
                 'label': algo.label,
+                'default_param': algo.default_param,
+                'default_param_value': algo.default_param_value,
                 'training': trainings_list
             }
             algos_list.append(algo_object)
@@ -78,7 +84,7 @@ def get_algorithm():
 @generator_blueprint.route('/train', methods=['POST'])
 def train():
     """Train the selected model"""
-    response_object, algo, category_id = verify_payload(request)
+    response_object, algo, category_id, length = verify_payload(request)
 
     # if response_object not None, an error was identified
     if response_object:
@@ -127,7 +133,7 @@ def train():
 @generator_blueprint.route('/generate', methods=['POST'])
 def generate_text():
     """Generate text"""
-    response_object, algo, category_id = verify_payload(request)
+    response_object, algo, category_id, length = verify_payload(request)
 
     # if response_object not None, an error was identified
     if response_object:
@@ -143,7 +149,7 @@ def generate_text():
     # The others letters must keep capital letters
     algo_class = algo.label[0].capitalize() + algo.label[1:] + "Algo"
     text_generator = models.TextGeneration(getattr(models, algo_class)())
-    result = text_generator.generateText(category_id)
+    result = text_generator.generateText(category_id, length)
 
     if not result:
         response_object = {
