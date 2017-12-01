@@ -12,6 +12,7 @@ function CategoriesList({
   updClick,
 }) {
   let input
+
   return (
     <div>
       Liste des Catégories :
@@ -41,7 +42,7 @@ function CategoriesList({
             ) : (
               <div>
                 {category.label}
-                {user !== null && (
+                {user && (category.owner_id === user.id || user.isAdmin) ? (
                   <button
                     onClick={e => {
                       e.preventDefault()
@@ -50,10 +51,12 @@ function CategoriesList({
                   >
                     Supprimer
                   </button>
+                ) : (
+                  ''
                 )}
               </div>
             )}
-            {user !== null && (
+            {user && (category.owner_id === user.id || user.isAdmin) ? (
               <button
                 onClick={e => {
                   e.preventDefault()
@@ -62,6 +65,8 @@ function CategoriesList({
               >
                 {category.is_in_edition ? 'Annuler' : 'Modifier'}
               </button>
+            ) : (
+              ''
             )}
           </li>
         ))}

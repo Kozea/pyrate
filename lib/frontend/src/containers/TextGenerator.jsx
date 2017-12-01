@@ -1,5 +1,5 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
@@ -139,26 +139,26 @@ function mapDispatchToProps(dispatch) {
     ),
   }
 }
-//
-// TextGenerator.propTypes = {
-//   actions: PropTypes.object.isRequired,
-//   algorithmes: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.number.isRequired,
-//       label: PropTypes.string.isRequired,
-//       training: PropTypes.shape({
-//         category_id: PropTypes.number.isRequired,
-//         last_train: PropTypes.string,
-//       }),
-//     }).isRequired
-//   ).isRequired,
-//   categories: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.number.isRequired,
-//       label: PropTypes.string.isRequired,
-//     }).isRequired
-//   ).isRequired,
-//   generatedText: PropTypes.string,
-// }
+
+TextGenerator.propTypes = {
+  actions: PropTypes.object.isRequired,
+  algorithmes: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+      training: PropTypes.shape({
+        category_id: PropTypes.number.isRequired,
+        last_train: PropTypes.string,
+      }),
+    }).isRequired
+  ).isRequired,
+  categories: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      label: PropTypes.string.isRequired,
+    }).isRequired
+  ).isRequired,
+  generatedText: PropTypes.string,
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(TextGenerator)
