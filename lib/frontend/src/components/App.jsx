@@ -1,8 +1,8 @@
 import React from 'react'
 
-import AddCategory from '../containers/AddCategory'
+// import AddCategory from '../containers/AddCategory'
 import Corpus from '../containers/Corpus'
-import DisplayCatList from '../containers/DisplayCategories'
+import CategoriesList from '../components/CategoriesList'
 import NavBar from '../containers/NavBar'
 import TextGenerator from '../containers/TextGenerator'
 
@@ -13,8 +13,8 @@ export default function App() {
       <hr />
       <TextGenerator />
       <hr />
-      <DisplayCatList />
-      <AddCategory />
+      <hr />
+      <CategoriesList />
       <hr />
       <Corpus />
     </div>

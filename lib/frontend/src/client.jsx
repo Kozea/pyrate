@@ -15,8 +15,9 @@ import {
 } from './actions'
 import { debug } from './config'
 
-const store = createStore(
+export const store = createStore(
   pyrateApp,
+  window.__STATE__, // Server state
   (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
     applyMiddleware(thunk)
   )
